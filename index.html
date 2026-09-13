@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0f0f0f">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>西鐵小巴系統</title>
@@ -556,6 +557,24 @@ function cleanLoginLogs() {
     db.ref('login_logs').update(updates).then(() => console.log('🧹 已清理 login_logs:', toDelete.length));
   }).catch(err => console.warn('清理 login_logs 失敗:', err));
 }
+function getRoute() {
+  const go = driverData.mode === 'busy' ? BUSY_GO : NORMAL_GO;
+  const back = driverData.mode === 'busy' ? BUSY_BACK : NORMAL_BACK;
+  return driverData.direction === 0 ? go : back;
+}
+function getCoords() {
+  const go = driverData.mode === 'busy' ? BUSY_GO_COORDS : NORMAL_GO_COORDS;
+  const back = driverData.mode === 'busy' ? BUSY_BACK_COORDS : NORMAL_BACK_COORDS;
+  return driverData.direction === 0 ? go : back;
+}
+const BUSY_GO = ["大棠黃泥墩","大棠山路巴士站","大棠村迴旋處","群潤花園","曉門","南坑排巴士站","南坑村","紅棗田","水喉頭","崇正公立學校","崇正新村","天龍花園","深涌村","禮修村巴士站","蝶翠峰巴士站","大旗嶺浸信會教堂","富達廣場巴士站","合益路","鳳翔路","大馬路燈位","元朗港鐵站"];
+const BUSY_GO_COORDS = [{lat:22.416313,lng:114.022155},{lat:22.416332,lng:114.023058},{lat:22.417982,lng:114.025327},{lat:22.421638,lng:114.027892},{lat:22.422562,lng:114.02959},{lat:22.422692,lng:114.030617},{lat:22.424852,lng:114.031972},{lat:22.42511,lng:114.03174},{lat:22.429618,lng:114.02862},{lat:22.429303,lng:114.028623},{lat:22.431183,lng:114.028508},{lat:22.433085,lng:114.02856},{lat:22.433853,lng:114.028602},{lat:22.434793,lng:114.028578},{lat:22.436858,lng:114.029397},{lat:22.438265,lng:114.02953},{lat:22.4406,lng:114.029515},{lat:22.441503,lng:114.029297},{lat:22.441865,lng:114.03208},{lat:22.444148,lng:114.032273},{lat:22.445758,lng:114.037078}];
+const BUSY_BACK = ["元朗港鐵站","朗和路","鳳翔路","合益路","富達廣場","蝶翠峰","禮修村","深涌村","天龍花園","田寮村","崇正新村","水喉頭","菜站","麥園","老圍","新路口","南坑村","棠景花園","南坑排","新樓","教堂","振南苑","山咀","大棠村","金龍花園","大棠山路","巴士站","宏基","大棠黃泥墩"];
+const BUSY_BACK_COORDS = [{lat:22.445758,lng:114.037078},{lat:22.444707,lng:114.034928},{lat:22.444185,lng:114.032277},{lat:22.44185,lng:114.032307},{lat:22.441973,lng:114.029638},{lat:22.438012,lng:114.029683},{lat:22.435922,lng:114.028992},{lat:22.433853,lng:114.028602},{lat:22.433085,lng:114.02856},{lat:22.431565,lng:114.028508},{lat:22.431183,lng:114.028508},{lat:22.429618,lng:114.02862},{lat:22.427947,lng:114.028982},{lat:22.427143,lng:114.029783},{lat:22.426547,lng:114.030365},{lat:22.4254,lng:114.031478},{lat:22.424852,lng:114.031972},{lat:22.423538,lng:114.032115},{lat:22.423063,lng:114.031763},{lat:22.4226,lng:114.030215},{lat:22.422075,lng:114.02837},{lat:22.421735,lng:114.028007},{lat:22.420233,lng:114.027247},{lat:22.418555,lng:114.026047},{lat:22.417378,lng:114.025125},{lat:22.416193,lng:114.024142},{lat:22.416197,lng:114.023803},{lat:22.41629,lng:114.023028},{lat:22.416313,lng:114.022155}];
+const NORMAL_GO = ["大棠黃泥墩","大棠山路巴士站","大棠村迴旋處","群潤花園","曉門","南坑排巴士站","南坑村","紅棗田","水喉頭","崇正公立學校","崇正新村","天龍花園","深涌村","禮修村巴士站","蝶翠峰巴士站","大旗嶺浸信會教堂","富達廣場巴士站","教育路麥當勞","鄉議局中學","大球場","元朗廣場","余仁生（大馬路）","家居站","元朗港鐵站"];
+const NORMAL_GO_COORDS = [{lat:22.416313,lng:114.022155},{lat:22.416332,lng:114.023058},{lat:22.417982,lng:114.025327},{lat:22.421638,lng:114.027892},{lat:22.422562,lng:114.02959},{lat:22.422692,lng:114.030617},{lat:22.424852,lng:114.031972},{lat:22.42511,lng:114.03174},{lat:22.429618,lng:114.02862},{lat:22.429303,lng:114.028623},{lat:22.431183,lng:114.028508},{lat:22.433085,lng:114.02856},{lat:22.433853,lng:114.028602},{lat:22.434793,lng:114.028578},{lat:22.436858,lng:114.029397},{lat:22.438265,lng:114.02953},{lat:22.4406,lng:114.029515},{lat:22.44303,lng:114.027818},{lat:22.443048,lng:114.025135},{lat:22.443182,lng:114.022137},{lat:22.444632,lng:114.023758},{lat:22.444547,lng:114.027602},{lat:22.44452,lng:114.030492},{lat:22.445847,lng:114.037022}];
+const NORMAL_BACK = ["元朗港鐵站","朗和路","鳳翔路","合益路","富達廣場","蝶翠峰","禮修村","深涌村","天龍花園","田寮村","崇正新村","水喉頭","菜站","麥園","老圍","新路口","南坑村","棠景花園","南坑排","新樓","教堂","振南苑","山咀","大棠村","金龍花園","大棠山路","巴士站","宏基","大棠黃泥墩"];
+const NORMAL_BACK_COORDS = [{lat:22.445758,lng:114.037078},{lat:22.444707,lng:114.034928},{lat:22.444185,lng:114.032277},{lat:22.44185,lng:114.032307},{lat:22.441973,lng:114.029638},{lat:22.438012,lng:114.029683},{lat:22.435922,lng:114.028992},{lat:22.433853,lng:114.028602},{lat:22.433085,lng:114.02856},{lat:22.431565,lng:114.028508},{lat:22.431183,lng:114.028508},{lat:22.429618,lng:114.02862},{lat:22.427947,lng:114.028982},{lat:22.427143,lng:114.029783},{lat:22.426547,lng:114.030365},{lat:22.4254,lng:114.031478},{lat:22.424852,lng:114.031972},{lat:22.423538,lng:114.032115},{lat:22.423063,lng:114.031763},{lat:22.4226,lng:114.030215},{lat:22.422075,lng:114.02837},{lat:22.421735,lng:114.028007},{lat:22.420233,lng:114.027247},{lat:22.418555,lng:114.026047},{lat:22.417378,lng:114.025125},{lat:22.416193,lng:114.024142},{lat:22.416197,lng:114.023803},{lat:22.41629,lng:114.023028},{lat:22.416313,lng:114.022155}];
 function updateDriverUI() {
   const route = getRoute(); const idx = driverData.stationIndex || 0;
   const station = route[idx] || '未知';
@@ -1689,4 +1708,575 @@ document.getElementById('login-google').addEventListener('click', function(){
       } catch(e) {}
       document.getElementById('login-modal').classList.remove('active');
       document.getElementById('btn-admin-panel').style.display = 'block';
-      loadAdminPanel(); initAdminWalkie(); apply
+      loadAdminPanel(); initAdminWalkie(); applyAdminPermissions();
+      showToast('管理員登入成功，歡迎 ' + email + (isSuperAdmin ? ' (超級管理員)' : ' (普通管理員)'));
+      if (voiceEnabled) speakCantonese('管理員登入成功');
+      showView('view-lobby');
+    })
+    .catch(err => {
+      isLoggingIn = false;
+      if (err.code === 'auth/popup-closed-by-user') showToast('登入視窗已關閉，請重新嘗試');
+      else if (err.code === 'auth/cancelled-popup-request') showToast('請勿重複點擊');
+      else showToast('登入失敗：' + err.message);
+      console.error(err);
+    });
+});
+document.getElementById('login-driver').addEventListener('click', function(){
+  document.getElementById('login-choice').style.display = 'none';
+  document.getElementById('driver-login-form').style.display = 'block';
+});
+document.getElementById('driver-login-back').addEventListener('click', function(){
+  document.getElementById('driver-login-form').style.display = 'none';
+  document.getElementById('login-choice').style.display = 'block';
+});
+document.getElementById('driver-login-btn').addEventListener('click', async function(){
+  const identifier = document.getElementById('driver-identifier').value.trim();
+  const errEl = document.getElementById('driver-login-error');
+  if (!identifier) { errEl.textContent = '請輸入電郵或電話號碼'; return; }
+  try {
+    await auth.signInAnonymously();
+    const role = await checkRole(identifier);
+    if (role !== 'driver' && role !== 'admin') { errEl.textContent = '此帳戶不是司機，請聯絡管理員'; return; }
+    currentUser.uid = auth.currentUser.uid; currentUser.identifier = identifier; currentUser.role = role; currentUser.loginTime = Date.now();
+    if (role === 'admin') { isSuperAdmin = isSuperAdminEmail(identifier); isAdmin = true; } else { isSuperAdmin = false; isAdmin = false; }
+    await db.ref('users/' + currentUser.uid).set({ identifier, role, lastLogin: Date.now() });
+    document.getElementById('login-modal').classList.remove('active');
+    if (role === 'admin') { document.getElementById('btn-admin-panel').style.display = 'block'; loadAdminPanel(); initAdminWalkie(); applyAdminPermissions(); }
+    else document.getElementById('btn-admin-panel').style.display = 'none';
+    showToast((role==='admin'?'管理員':'司機') + '登入成功，歡迎 ' + identifier);
+    if (voiceEnabled) speakCantonese((role==='admin'?'管理員':'司機')+'登入成功');
+    showView('view-lobby');
+  } catch(e) { errEl.textContent = '登入失敗：'+e.message; }
+});
+document.getElementById('login-passenger').addEventListener('click', function(){
+  document.getElementById('login-choice').style.display = 'none';
+  document.getElementById('passenger-login-form').style.display = 'block';
+});
+document.getElementById('passenger-login-back').addEventListener('click', function(){
+  document.getElementById('passenger-login-form').style.display = 'none';
+  document.getElementById('login-choice').style.display = 'block';
+});
+document.getElementById('passenger-login-btn').addEventListener('click', async function(){
+  const phone = document.getElementById('passenger-phone').value.trim();
+  const errEl = document.getElementById('passenger-login-error');
+  if (!phone || !/^\d{8,}$/.test(phone)) { errEl.textContent = '請輸入 8 位數字電話號碼'; return; }
+  try {
+    await auth.signInAnonymously();
+    const role = await checkRole(phone);
+    currentUser.uid = auth.currentUser.uid; currentUser.identifier = phone; currentUser.role = role; currentUser.loginTime = Date.now();
+    await db.ref('users/' + currentUser.uid).set({ identifier: phone, role, lastLogin: Date.now() });
+    document.getElementById('login-modal').classList.remove('active');
+    if (role === 'admin') {
+      isAdmin = true; isSuperAdmin = isSuperAdminEmail(phone);
+      document.getElementById('btn-admin-panel').style.display = 'block';
+      loadAdminPanel(); initAdminWalkie(); applyAdminPermissions();
+    } else { isAdmin = false; isSuperAdmin = false; document.getElementById('btn-admin-panel').style.display = 'none'; }
+    showToast('乘客登入成功，歡迎 ' + phone);
+    if (voiceEnabled) speakCantonese('乘客登入成功');
+    showView('view-lobby');
+  } catch(e) { errEl.textContent = '登入失敗：'+e.message; }
+});
+document.getElementById('login-cancel').addEventListener('click', function(){
+  document.getElementById('login-modal').classList.remove('active');
+});
+document.getElementById('btn-logout').addEventListener('click', function(){
+  if (gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+  if (gpsRetryTimer) { clearTimeout(gpsRetryTimer); gpsRetryTimer = null; }
+  releaseWakeLock();
+  auth.signOut().catch(console.warn);
+  currentUser = { uid: null, identifier: null, role: 'passenger', loginTime: null };
+  isSuperAdmin = false; isAdmin = false;
+  document.getElementById('btn-admin-panel').style.display = 'none';
+  if (driverData.plate) db.ref('van/active_buses/' + driverData.plate).remove().catch(() => {});
+  resetDriverData(false);
+  lastReportedIndex = -1;
+  showToast('已登出');
+  showView('view-lobby');
+  if (voiceEnabled) speakCantonese('已登出，下次見');
+});
+safeClick(document.getElementById('btn-passenger'), function(){
+  if (!currentUser.uid){ document.getElementById('login-modal').classList.add('active'); return; }
+  showView('view-passenger-list');
+  loadBusList();
+  if (voiceEnabled) speakCantonese('乘客頁面');
+});
+safeClick(document.getElementById('btn-driver'), function(){
+  if (!currentUser.uid){ document.getElementById('login-modal').classList.add('active'); return; }
+  if (currentUser.role !== 'driver' && currentUser.role !== 'admin'){ showToast('只有司機或管理員可以進入此頁'); if (voiceEnabled) speakCantonese('權限不足'); return; }
+  showView('view-driver');
+  initDriverPanel(); initWalkieTalkie();
+  if (voiceEnabled) speakCantonese('司機頁面');
+});
+safeClick(document.getElementById('btn-admin-panel'), function(){
+  if (!isAdmin){ showToast('權限不足'); return; }
+  showView('view-admin');
+  loadAdminPanel(); initAdminWalkie(); applyAdminPermissions();
+  if (voiceEnabled) speakCantonese('管理後台');
+});
+safeClick(document.getElementById('btn-generate-qr'), function(){
+  const box = document.getElementById('qr-box');
+  if (box.style.display === 'block'){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = '<div id="qrcode-container"></div><button class="btn btn-secondary" style="margin-top:8px;font-size:18px;padding:14px;">關閉</button>';
+  new QRCode(document.getElementById('qrcode-container'), { text: window.location.href, width:200, height:200 });
+  box.querySelector('button').addEventListener('click', function(){ box.style.display = 'none'; });
+});
+safeClick(document.getElementById('btn-guide-voice'), function(){
+  speakCantonese('歡迎使用西鐵小巴系統。司機請先登入，然後輸入車牌，再按開始當值。系統會自動用 GPS 定位，每到一個站就會自動報站。乘客可以追蹤車輛，收聽廣東話報站。請支持開發者，轉數快號碼 122891914。');
+});
+safeClick(document.getElementById('btn-refresh-buslist'), function(){
+  showToast('🔄 重新整理中...');
+  if (busListRef) busListRef.off();
+  loadBusList();
+});
+safeClick(document.getElementById('btn-back-list'), function(){
+  if (busListRef) busListRef.off();
+  showView('view-lobby');
+  if (voiceEnabled) speakCantonese('返回大堂');
+});
+safeClick(document.getElementById('btn-back-track'), function(){
+  if (passengerMsgRef) passengerMsgRef.off();
+  if (passengerBusRef) passengerBusRef.off();
+  showView('view-passenger-list');
+  loadBusList();
+  if (voiceEnabled) speakCantonese('返回列表');
+});
+safeClick(document.getElementById('btn-pass-send'), function(){
+  const input = document.getElementById('pass-msg-input');
+  const text = input?.value.trim();
+  if (!text || !currentBusId) return;
+  if (text.length > CONFIG.MSG_MAX_LEN) { showToast(`訊息不可超過 ${CONFIG.MSG_MAX_LEN} 字`); return; }
+  if (!_checkMsgRate()) return;
+  db.ref('van/messages').push({
+    busId: currentBusId, senderUid: currentUser.uid, senderIdentifier: currentUser.identifier,
+    text: text, timestamp: Date.now(), type: 'text'
+  }).then(() => { input.value = ''; showToast('已發送'); if(voiceEnabled) speakCantonese('已發送'); });
+});
+safeClick(document.getElementById('btn-pass-clear'), function(){
+  if (!confirm('確定隱藏所有訊息？可還原。')) return;
+  db.ref('van/messages').orderByChild('busId').equalTo(currentBusId).once('value', snap => {
+    const updates = {};
+    snap.forEach(child => { updates[child.key + '/hidden'] = true; });
+    db.ref('van/messages').update(updates).then(() => {
+      showToast('已隱藏所有訊息');
+      document.getElementById('btn-pass-restore').style.display = 'block';
+    });
+  });
+});
+safeClick(document.getElementById('btn-pass-restore'), function(){
+  if (!confirm('確定還原所有隱藏訊息？')) return;
+  db.ref('van/messages').orderByChild('busId').equalTo(currentBusId).once('value', snap => {
+    const updates = {};
+    snap.forEach(child => { if(child.val().hidden) updates[child.key + '/hidden'] = false; });
+    db.ref('van/messages').update(updates).then(() => {
+      showToast('已還原所有訊息');
+      document.getElementById('btn-pass-restore').style.display = 'none';
+    });
+  });
+});
+safeClick(document.getElementById('btn-prev'), goToPrevStation);
+safeClick(document.getElementById('btn-next'), goToNextStation);
+safeClick(document.getElementById('btn-add-pass'), function(){
+  if (!driverData.isActive){ showToast('請先開始當值'); return; }
+  if (driverData.passengerCount >= driverData.carSeats){ showToast(`已達 ${driverData.carSeats} 座上限`); return; }
+  driverData.passengerCount++;
+  if (driverData.passengerCount === driverData.carSeats) driverData.isFull = true;
+  updateDriverDB();
+});
+safeClick(document.getElementById('btn-sub-pass'), function(){
+  if (!driverData.isActive){ showToast('請先開始當值'); return; }
+  if (driverData.passengerCount > 0){ driverData.passengerCount--; if (driverData.passengerCount < driverData.carSeats) driverData.isFull = false; updateDriverDB(); }
+  else showToast('乘客量已是 0');
+});
+safeClick(document.getElementById('d-full-btn'), function(){
+  if (!driverData.isActive){ showToast('請先開始當值'); return; }
+  driverData.isFull = !driverData.isFull;
+  if (driverData.isFull) driverData.passengerCount = driverData.carSeats;
+  else driverData.passengerCount = Math.max(0, driverData.carSeats - 1);
+  updateDriverDB();
+});
+safeClick(document.getElementById('d-car-btn'), function(){
+  driverData.carSeats = driverData.carSeats === 16 ? 19 : 16;
+  if (driverData.passengerCount > driverData.carSeats) driverData.passengerCount = driverData.carSeats;
+  driverData.isFull = driverData.passengerCount === driverData.carSeats;
+  updateDriverDB();
+});
+safeClick(document.getElementById('btn-switch-dir'), function(){
+  if (!driverData.isActive){ showToast('請先開始當值'); return; }
+  driverData.direction = driverData.direction === 0 ? 1 : 0;
+  driverData.stationIndex = 0;
+  lastReportedIndex = -1; lastDriverScrollIndex = -1;
+  if (gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+  startGpsWatch();
+  updateDriverDB(); renderDriverRouteStrip();
+  if (voiceEnabled) speakCantonese('已調頭');
+});
+safeClick(document.getElementById('btn-mode-toggle'), function(){
+  if (!driverData.isActive){ showToast('請先開始當值'); return; }
+  driverData.mode = driverData.mode === 'busy' ? 'normal' : 'busy';
+  driverData.stationIndex = 0;
+  lastReportedIndex = -1; lastDriverScrollIndex = -1;
+  updateDriverDB(); renderDriverRouteStrip();
+  const modeName = driverData.mode === 'busy' ? '西鐵快線' : '市中心循環線';
+  showToast('已切換至 ' + modeName);
+  if (voiceEnabled) speakCantonese('已切換至 ' + modeName);
+  const modeBtn = document.getElementById('btn-mode-toggle');
+  if (modeBtn) modeBtn.textContent = driverData.mode === 'busy' ? '🔄 切換至市中心循環線' : '🔄 切換至西鐵快線';
+});
+safeClick(document.getElementById('btn-driver-send'), function(){ sendDriverMsg('driver-msg-input'); });
+safeClick(document.getElementById('btn-driver-send-overlay'), function(){ sendDriverMsg('driver-msg-input-overlay'); });
+safeClick(document.getElementById('btn-driver-clear'), function(){ clearDriverMsgs('btn-driver-restore'); });
+safeClick(document.getElementById('btn-driver-clear-overlay'), function(){ clearDriverMsgs('btn-driver-restore-overlay'); });
+safeClick(document.getElementById('btn-driver-restore'), function(){ restoreDriverMsgs('btn-driver-restore'); });
+safeClick(document.getElementById('btn-driver-restore-overlay'), function(){ restoreDriverMsgs('btn-driver-restore-overlay'); });
+safeClick(document.getElementById('btn-driver-back'), function(){
+  if (gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+  if (gpsRetryTimer) { clearTimeout(gpsRetryTimer); gpsRetryTimer = null; }
+  releaseWakeLock();
+  if (driverMsgRef) driverMsgRef.off();
+  if (walkieRef) walkieRef.off();
+  if (driverBusRef) driverBusRef.off();
+  showView('view-lobby');
+  if (voiceEnabled) speakCantonese('返回大堂');
+});
+safeClick(document.getElementById('close-msg-overlay'), function(){
+  document.getElementById('msg-overlay').classList.remove('show');
+});
+safeClick(document.getElementById('walkie-refresh-targets'), updateWalkieTargets);
+setupRecordButton('btn-walkie-record','walkie-timer',(base64, mime)=>{
+  const target = document.getElementById('walkie-target')?.value || 'all';
+  if (!driverData.plate){ showToast('請先設定車牌'); return; }
+  if (!_checkMsgRate()) return;
+  db.ref('van/walkie_talkie').push({
+    senderUid: currentUser.uid, senderIdentifier: currentUser.identifier, senderPlate: driverData.plate,
+    target: target, audio: base64, audioMime: mime || 'audio/webm', timestamp: Date.now(), type: 'walkie_audio'
+  }).then(()=>{ showToast('對講機語音已發送'); });
+});
+setupRecordButton('btn-driver-record','driver-timer',(base64, mime)=>{
+  if (!driverData.plate) return;
+  if (!_checkMsgRate()) return;
+  db.ref('van/messages').push({
+    busId: driverData.plate, senderUid: currentUser.uid, senderIdentifier: currentUser.identifier,
+    audio: base64, audioMime: mime || 'audio/webm', timestamp: Date.now(), type: 'audio'
+  }).then(()=>{ showToast('語音已發送'); });
+});
+setupRecordButton('btn-driver-record-overlay','driver-timer-overlay',(base64, mime)=>{
+  if (!driverData.plate) return;
+  if (!_checkMsgRate()) return;
+  db.ref('van/messages').push({
+    busId: driverData.plate, senderUid: currentUser.uid, senderIdentifier: currentUser.identifier,
+    audio: base64, audioMime: mime || 'audio/webm', timestamp: Date.now(), type: 'audio'
+  }).then(()=>{ showToast('語音已發送'); });
+});
+safeClick(document.getElementById('btn-back-admin'), function(){
+  showView('view-lobby');
+  if (voiceEnabled) speakCantonese('返回大堂');
+});
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    this.classList.add('active');
+    const sec = document.getElementById('admin-section-' + this.dataset.tab);
+    if (sec) sec.classList.add('active');
+    if (this.dataset.tab === 'devices') loadDeviceList();
+    if (this.dataset.tab === 'walkie'){ initAdminWalkie(); updateAdminWalkieTargets(); }
+    if (this.dataset.tab === 'bans' || this.dataset.tab === 'kick') db.ref('van/active_buses').once('value', snap => { updateOnlineLists(snap.val()||{}); });
+    if (this.dataset.tab === 'manage-admins') loadAdminList();
+  });
+});
+safeClick(document.getElementById('floating-announce-btn'), function(){
+  document.getElementById('announce-overlay').classList.add('show');
+  loadAnnounceList();
+});
+safeClick(document.getElementById('announce-bell'), function(){
+  document.getElementById('announce-modal').classList.add('active');
+});
+safeClick(document.getElementById('announce-modal-close'), function(){
+  document.getElementById('announce-modal').classList.remove('active');
+});
+safeClick(document.getElementById('close-announce-overlay'), function(){
+  document.getElementById('announce-overlay').classList.remove('show');
+});
+function loadAnnounceList(){
+  const container = document.getElementById('announce-list-content'); if (!container) return;
+  db.ref('van/announcements').orderByChild('timestamp').limitToLast(20).once('value', snap => {
+    container.innerHTML = '';
+    snap.forEach(child => {
+      const ann = child.val(), isAudio = !!ann.audio;
+      const div = document.createElement('div');
+      div.className = 'announce-item';
+      const time = document.createElement('div');
+      time.className = 'time';
+      time.textContent = new Date(ann.timestamp).toLocaleString('zh-HK');
+      div.appendChild(time);
+      const text = document.createElement('div');
+      text.className = 'text';
+      text.textContent = isAudio ? '🎤 [語音公告]' : (ann.text || '');
+      div.appendChild(text);
+      if (isAudio) {
+        const playBtn = document.createElement('button');
+        playBtn.className = 'play-audio'; playBtn.textContent = '▶ 播放';
+        playBtn.addEventListener('click', ()=> playBoostedAudio(ann.audio, 10, ann.audioMime));
+        div.appendChild(playBtn);
+      }
+      container.appendChild(div);
+    });
+    if (container.children.length === 0) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center;color:#888;padding:20px;font-size:18px;';
+      empty.textContent = '暫無公告';
+      container.appendChild(empty);
+    }
+  });
+}
+document.getElementById('fps-code').addEventListener('click', function(){
+  const text = '122891914';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => { showToast('✅ 已複製：'+text); speakCantonese('多謝支持'); })
+      .catch(() => { const input = document.createElement('input'); input.value = text; document.body.appendChild(input); input.select(); document.execCommand('copy'); document.body.removeChild(input); showToast('✅ 已複製：'+text); });
+  } else {
+    const input = document.createElement('input'); input.value = text; document.body.appendChild(input); input.select(); document.execCommand('copy'); document.body.removeChild(input); showToast('✅ 已複製：'+text);
+  }
+});
+document.getElementById('global-voice-btn').addEventListener('click', function(){
+  voiceEnabled = !voiceEnabled;
+  this.textContent = voiceEnabled ? '🔊' : '🔇';
+  this.classList.toggle('muted');
+  showToast(voiceEnabled ? '語音已開啟' : '語音已關閉');
+  localStorage.setItem('globalVoice', voiceEnabled ? 'on' : 'off');
+  if (!voiceEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+});
+if (localStorage.getItem('globalVoice') === 'off') {
+  voiceEnabled = false;
+  document.getElementById('global-voice-btn').textContent = '🔇';
+  document.getElementById('global-voice-btn').classList.add('muted');
+}
+function sendDriverMsg(inputId) {
+  const input = document.getElementById(inputId);
+  const text = input?.value.trim();
+  if (!text || !driverData.plate) return;
+  if (text.length > CONFIG.MSG_MAX_LEN) { showToast(`訊息不可超過 ${CONFIG.MSG_MAX_LEN} 字`); return; }
+  if (!_checkMsgRate()) return;
+  db.ref('van/messages').push({
+    busId: driverData.plate, senderUid: currentUser.uid, senderIdentifier: currentUser.identifier,
+    text: text, timestamp: Date.now(), type: 'text'
+  }).then(() => { input.value = ''; showToast('已廣播'); if (voiceEnabled) speakCantonese('廣播已發送'); });
+}
+function clearDriverMsgs(restoreBtnId) {
+  if (!confirm('確定隱藏所有訊息？可還原。')) return;
+  db.ref('van/messages').orderByChild('busId').equalTo(driverData.plate).once('value', snap => {
+    const updates = {};
+    snap.forEach(child => { updates[child.key + '/hidden'] = true; });
+    db.ref('van/messages').update(updates).then(() => { showToast('已隱藏所有訊息'); const el = document.getElementById(restoreBtnId); if (el) el.style.display = 'block'; });
+  });
+}
+function restoreDriverMsgs(restoreBtnId) {
+  if (!confirm('確定還原所有隱藏訊息？')) return;
+  db.ref('van/messages').orderByChild('busId').equalTo(driverData.plate).once('value', snap => {
+    const updates = {};
+    snap.forEach(child => { if(child.val().hidden) updates[child.key + '/hidden'] = false; });
+    db.ref('van/messages').update(updates).then(() => { showToast('已還原所有訊息'); const el = document.getElementById(restoreBtnId); if (el) el.style.display = 'none'; });
+  });
+}
+function showMsgNotification(type, sender, text) {
+  const el = document.getElementById('msg-notification');
+  const icon = document.getElementById('notif-icon');
+  const title = document.getElementById('notif-title');
+  const sub = document.getElementById('notif-sub');
+  if (!el) return;
+  if (notificationTimer) { clearTimeout(notificationTimer); notificationTimer = null; }
+  if (type === 'audio') { icon.textContent = '🎤'; title.textContent = '新語音訊息'; sub.textContent = `來自 ${sender || '乘客'}`; }
+  else { icon.textContent = '📩'; title.textContent = text ? text.substring(0, 30) + (text.length > 30 ? '...' : '') : '新訊息'; sub.textContent = `來自 ${sender || '乘客'}`; }
+  el.classList.add('show');
+  notificationTimer = setTimeout(() => { el.classList.remove('show'); notificationTimer = null; }, 3500);
+}
+document.getElementById('notif-close').addEventListener('click', function() {
+  document.getElementById('msg-notification').classList.remove('show');
+  if (notificationTimer) { clearTimeout(notificationTimer); notificationTimer = null; }
+});
+db.ref('.info/connected').on('value', snap => {
+  const statusEl = document.getElementById('connection-status'); if (!statusEl) return;
+  if (snap.val()) {
+    statusEl.textContent = '🟢 已成功連線至伺服器';
+    statusEl.className = 'connection-status online';
+    setTimeout(() => { statusEl.style.display = 'none'; }, 2500);
+  } else {
+    statusEl.textContent = '🔴 網絡已中斷，嘗試重新連線中...';
+    statusEl.className = 'connection-status offline';
+    statusEl.style.display = 'block';
+  }
+});
+auth.onAuthStateChanged(function(user){
+  if (user) {
+    db.ref('users/'+user.uid).once('value').then(snap => {
+      const data = snap.val();
+      if (!data) return;
+      currentUser.uid = user.uid;
+      currentUser.identifier = data.identifier || '';
+      currentUser.role = data.role || 'passenger';
+      if (currentUser.role === 'admin') {
+        isAdmin = true; isSuperAdmin = isSuperAdminEmail(currentUser.identifier);
+        document.getElementById('btn-admin-panel').style.display = 'block';
+        loadAdminPanel(); initAdminWalkie(); applyAdminPermissions();
+      } else { isAdmin = false; isSuperAdmin = false; }
+      document.getElementById('login-modal').classList.remove('active');
+      showToast('歡迎回來，' + currentUser.identifier);
+      if (currentUser.role === 'driver' || currentUser.role === 'admin') {
+        const savedPlate = getSavedPlate(currentUser.identifier);
+        if (savedPlate) {
+          db.ref('van/active_buses/' + savedPlate).once('value', snap => {
+            const busData = snap.val();
+            if (busData && busData.isActive === true) {
+              driverData.plate = savedPlate;
+              driverData.mode = busData.mode || 'busy';
+              driverData.direction = busData.direction || 0;
+              driverData.stationIndex = busData.stationIndex || 0;
+              driverData.passengerCount = busData.passengerCount || 0;
+              driverData.isActive = true;
+              driverData.carSeats = busData.carSeats || 16;
+              driverData.isFull = busData.isFull || false;
+              lastReportedIndex = driverData.stationIndex;
+              lastDriverScrollIndex = -1;
+              updateDriverUI();
+              document.getElementById('start-gps').style.display = 'none';
+              document.getElementById('stop-gps').style.display = 'block';
+              setTimeout(() => { if (driverData.isActive && !gpsWatchId) startGpsWatch(); }, 1000);
+              showToast('已自動恢復當值狀態');
+            }
+          });
+        }
+      }
+    });
+  }
+});
+function cleanOldMessages() {
+  const cutoff = Date.now() - CONFIG.MESSAGE_TTL_MS;
+  db.ref('van/messages').orderByChild('timestamp').endAt(cutoff).once('value')
+    .then(snapshot => {
+      const updates = {}; let count = 0;
+      snapshot.forEach(child => { updates[child.key] = null; count++; });
+      if (count > 0) { db.ref('van/messages').update(updates); console.log(`🧹 已自動刪除 ${count} 條超過 48 小時嘅訊息`); }
+    }).catch(err => console.warn('清理訊息失敗:', err));
+  db.ref('van/walkie_talkie').orderByChild('timestamp').endAt(cutoff).once('value')
+    .then(snapshot => {
+      const updates = {}; let count = 0;
+      snapshot.forEach(child => { updates[child.key] = null; count++; });
+      if (count > 0) { db.ref('van/walkie_talkie').update(updates); console.log(`🧹 已自動刪除 ${count} 條超過 48 小時嘅對講機訊息`); }
+    }).catch(err => console.warn('清理對講機訊息失敗:', err));
+}
+setTimeout(cleanOldMessages, 3000);
+setInterval(cleanOldMessages, 60 * 60 * 1000);
+setTimeout(cleanLoginLogs, 5000);
+safeClick(document.getElementById('btn-clear-all-msgs'), function() {
+  if (!isAdmin) { showToast('⛔ 權限不足'); return; }
+  if (!confirm('⚠️ 永久刪除所有訊息？無法復原！')) return;
+  db.ref('van/messages').once('value', snap => {
+    const updates = {};
+    snap.forEach(child => { updates[child.key] = null; });
+    db.ref('van/messages').update(updates).then(() => showToast('✅ 已清除全部訊息')).catch(err => showToast('❌ 清除失敗：' + err.message));
+  });
+});
+safeClick(document.getElementById('btn-restore-all-msgs'), function() {
+  if (!confirm('確定還原所有隱藏訊息？')) return;
+  db.ref('van/messages').once('value', snap => {
+    const updates = {};
+    snap.forEach(child => { if (child.val().hidden) updates[child.key + '/hidden'] = false; });
+    db.ref('van/messages').update(updates).then(() => { showToast('已還原所有 hidden 訊息'); });
+  });
+});
+safeClick(document.getElementById('btn-publish-announce'), function() {
+  const input = document.getElementById('admin-announce-text');
+  const text = input?.value.trim();
+  if (!text) { showToast('請輸入公告內容'); return; }
+  if (text.length > CONFIG.MSG_MAX_LEN) { showToast(`公告不可超過 ${CONFIG.MSG_MAX_LEN} 字`); return; }
+  db.ref('van/announcements').push({ text: text, publisher: currentUser.identifier, timestamp: Date.now() }).then(() => {
+    input.value = ''; showToast('✅ 公告已發佈');
+  });
+});
+setupRecordButton('btn-admin-announce-record', 'admin-announce-timer', (base64, mime) => {
+  db.ref('van/announcements').push({ audio: base64, audioMime: mime || 'audio/webm', publisher: currentUser.identifier, timestamp: Date.now() }).then(() => {
+    showToast('✅ 語音公告已發佈');
+  });
+});
+safeClick(document.getElementById('btn-clear-announce'), function() {
+  if (!requireSuperAdmin()) return;
+  if (!confirm('確定清除所有公告？')) return;
+  db.ref('van/announcements').remove().then(() => { showToast('已清除所有公告'); });
+});
+safeClick(document.getElementById('btn-broadcast-target-all'), function() {
+  document.getElementById('admin-broadcast-target').value = '';
+  showToast('已設定廣播目標：全部車輛');
+});
+safeClick(document.getElementById('btn-admin-broadcast-send'), function() {
+  const target = document.getElementById('admin-broadcast-target')?.value.trim().toUpperCase() || '';
+  const input = document.getElementById('admin-broadcast-input');
+  const text = input?.value.trim();
+  if (!text) { showToast('請輸入廣播訊息'); return; }
+  if (text.length > CONFIG.MSG_MAX_LEN) { showToast(`廣播不可超過 ${CONFIG.MSG_MAX_LEN} 字`); return; }
+  db.ref('van/messages').push({
+    busId: target || '廣播', senderUid: currentUser.uid, senderIdentifier: currentUser.identifier + ' (👑廣播)',
+    text: text, timestamp: Date.now(), type: 'broadcast'
+  }).then(() => {
+    input.value = '';
+    document.getElementById('admin-broadcast-status').textContent = '✅ 已發送廣播至 ' + (target || '全體');
+    showToast('廣播已發送');
+  });
+});
+setupRecordButton('btn-admin-broadcast-record', 'admin-broadcast-timer', (base64, mime) => {
+  const target = document.getElementById('admin-broadcast-target')?.value.trim().toUpperCase() || '';
+  db.ref('van/messages').push({
+    busId: target || '廣播', senderUid: currentUser.uid, senderIdentifier: currentUser.identifier + ' (👑廣播)',
+    audio: base64, audioMime: mime || 'audio/webm', timestamp: Date.now(), type: 'broadcast_audio'
+  }).then(() => {
+    document.getElementById('admin-broadcast-status').textContent = '✅ 語音廣播已發送';
+    showToast('語音廣播已發送');
+  });
+});
+safeClick(document.getElementById('btn-add-driver'), function() {
+  const input = document.getElementById('admin-add-driver-identifier');
+  const identifier = input?.value.trim();
+  if (!identifier) { showToast('請輸入電郵或電話號碼'); return; }
+  db.ref('drivers').push({ identifier: identifier, addedBy: currentUser.identifier, createdAt: Date.now() }).then(() => {
+    input.value = '';
+    document.getElementById('admin-add-driver-status').textContent = '✅ 已新增司機：' + identifier;
+    showToast('司機已成功新增');
+  });
+});
+safeClick(document.getElementById('btn-add-admin'), function() {
+  if (!requireSuperAdmin()) return;
+  const input = document.getElementById('admin-add-admin-email');
+  const email = input?.value.trim();
+  if (!email || !email.includes('@')) { showToast('請輸入有效的 Google 電郵'); return; }
+  db.ref('admins').push({ identifier: email, email: email, addedBy: currentUser.identifier, createdAt: Date.now() }).then(() => {
+    input.value = '';
+    document.getElementById('admin-add-admin-status').textContent = '✅ 已新增管理員：' + email;
+    showToast('管理員已新增');
+    loadAdminList();
+  });
+});
+safeClick(document.getElementById('admin-walkie-refresh'), updateAdminWalkieTargets);
+setupRecordButton('btn-admin-walkie-record', 'admin-walkie-timer', (base64, mime) => {
+  const target = document.getElementById('admin-walkie-target')?.value || 'all';
+  db.ref('van/walkie_talkie').push({
+    senderUid: currentUser.uid, senderIdentifier: currentUser.identifier + ' (👑管理員)',
+    senderPlate: '👑 管理員', target: target, audio: base64, audioMime: mime || 'audio/webm',
+    timestamp: Date.now(), type: 'walkie_audio'
+  }).then(() => { showToast('管理員對講機語音已發送'); });
+});
+safeClick(document.getElementById('btn-clear-walkie'), function(e) {
+  if (!isAdmin) { showToast('⛔ 權限不足'); return; }
+  if (!confirm('⚠️ 確定清除所有對講機訊息？')) return;
+  db.ref('van/walkie_talkie').once('value', snap => {
+    const updates = {};
+    snap.forEach(child => { updates[child.key] = null; });
+    if (Object.keys(updates).length === 0) { showToast('目前沒有對講機訊息'); return; }
+    db.ref('van/walkie_talkie').update(updates).then(() => { showToast('✅ 已清除所有對講機訊息'); });
+  });
+});
+window.startDuty = startDuty;
+window.stopDuty = stopDuty;
+console.log('✅ 西鐵小巴系統 完整版已就緒');
+</script>
+</body>
+</html>
