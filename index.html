@@ -8,8 +8,8 @@
 :root{--bg:#0a0805;--gold:#d4af37;--gold-b:#f5d76e;--txt:#f5f0e1;--txt2:#a89b7a;--line:rgba(212,175,55,.18)}
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:radial-gradient(circle at top,rgba(212,175,55,.08),transparent 50%),linear-gradient(180deg,#0a0805,#1a150d);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
-.logo{font-size:80px;margin-bottom:14px;filter:drop-shadow(0 0 40px rgba(212,175,55,.6))}
-h1{font-size:26px;font-weight:800;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;letter-spacing:2px}
+.logo-wrap{margin-bottom:20px;filter:drop-shadow(0 0 40px rgba(220,38,38,.6))}
+h1{font-size:26px;font-weight:800;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;letter-spacing:2px}
 .sub{font-size:14px;color:var(--txt2);margin-bottom:40px;letter-spacing:1px}
 .divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 36px}
 .btn{display:block;width:100%;max-width:320px;padding:22px;margin-bottom:16px;border-radius:16px;font-size:18px;font-weight:700;text-decoration:none;text-align:center;transition:all .2s;border:1px solid var(--line);cursor:pointer;font-family:inherit}
@@ -19,13 +19,54 @@ h1{font-size:26px;font-weight:800;background:linear-gradient(135deg,#f5d76e,#d4a
 .info-box{margin-top:20px;padding:16px;font-size:12px;line-height:1.9;background:rgba(0,0,0,.4);border:1px solid var(--line);color:var(--txt2);border-radius:12px;max-width:320px;width:100%;text-align:left}
 .info-box strong{color:var(--gold-b)}
 .footer{margin-top:36px;font-size:11px;color:#5a5240;line-height:1.6;letter-spacing:.5px}
-.ver{display:inline-block;padding:2px 8px;background:rgba(212,175,55,.15);color:var(--gold-b);border-radius:8px;font-size:10px;margin-left:6px;border:1px solid rgba(212,175,55,.3)}
 </style>
 </head>
 <body>
-<div class="logo">🚐</div>
+
+<!-- 🔴 紅色 19 座小巴 SVG -->
+<div class="logo-wrap">
+  <svg width="180" height="130" viewBox="0 0 180 130" xmlns="http://www.w3.org/2000/svg">
+    <!-- 車身主體 -->
+    <rect x="10" y="30" width="160" height="70" rx="14" fill="#dc2626"/>
+    <!-- 車身高光 -->
+    <rect x="10" y="30" width="160" height="20" rx="14" fill="#ef4444" opacity="0.5"/>
+    <!-- 車頂線條 -->
+    <rect x="15" y="28" width="150" height="6" rx="3" fill="#991b1b"/>
+    <!-- 車窗（左至右） -->
+    <rect x="22" y="42" width="22" height="18" rx="3" fill="#0a0805"/>
+    <rect x="48" y="42" width="22" height="18" rx="3" fill="#0a0805"/>
+    <rect x="74" y="42" width="22" height="18" rx="3" fill="#0a0805"/>
+    <rect x="100" y="42" width="22" height="18" rx="3" fill="#0a0805"/>
+    <!-- 車門 -->
+    <rect x="126" y="42" width="24" height="26" rx="3" fill="#0a0805" stroke="#fbbf24" stroke-width="1.5"/>
+    <rect x="137.5" y="42" width="1" height="26" fill="#fbbf24"/>
+    <!-- 車身金色線條 -->
+    <rect x="10" y="72" width="160" height="3" fill="#d4af37"/>
+    <!-- 底盤 -->
+    <rect x="10" y="82" width="160" height="18" rx="8" fill="#7f1d1d"/>
+    <!-- 前輪 -->
+    <circle cx="45" cy="105" r="13" fill="#1a1a1a"/>
+    <circle cx="45" cy="105" r="5" fill="#666"/>
+    <circle cx="45" cy="105" r="2" fill="#aaa"/>
+    <!-- 後輪 -->
+    <circle cx="135" cy="105" r="13" fill="#1a1a1a"/>
+    <circle cx="135" cy="105" r="5" fill="#666"/>
+    <circle cx="135" cy="105" r="2" fill="#aaa"/>
+    <!-- 車頭燈 -->
+    <circle cx="163" cy="78" r="4" fill="#fbbf24"/>
+    <circle cx="163" cy="78" r="2" fill="#fff"/>
+    <!-- 車尾燈 -->
+    <circle cx="17" cy="78" r="3" fill="#f87171"/>
+    <!-- 車牌 -->
+    <rect x="65" y="88" width="50" height="10" rx="2" fill="#fbbf24"/>
+    <text x="90" y="96" font-size="7" font-weight="bold" text-anchor="middle" fill="#1a150d">19 SEATS</text>
+    <!-- 車頂天線 -->
+    <rect x="150" y="22" width="2" height="10" fill="#7f1d1d"/>
+  </svg>
+</div>
+
 <h1>浚鍵管理有限公司</h1>
-<div class="sub">西鐵小巴系統 <span class="ver">v5.5 黑金</span></div>
+<div class="sub">西鐵小巴系統</div>
 <div class="divider"></div>
 
 <a href="driver-pro.html" class="btn btn-driver">🚏 司機專業端</a>
