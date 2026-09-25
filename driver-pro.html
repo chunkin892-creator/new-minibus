@@ -20,7 +20,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .tab.active{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;border-color:transparent;box-shadow:0 4px 14px rgba(212,175,55,.35)}
 .card{background:linear-gradient(145deg,var(--card),var(--card2));border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--line);box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .card-title{font-size:16px;font-weight:700;color:var(--gold-b);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-/* 按鈕加大 */
 .btn{width:100%;padding:19px;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:10px;transition:all .15s;text-align:center;font-family:inherit;letter-spacing:.3px}
 .btn:active{transform:scale(.98);opacity:.85}
 .btn:disabled{opacity:.4;cursor:not-allowed}
@@ -31,9 +30,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .btn-warn{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a150d}
 .btn-secondary{background:#1e1a12;color:var(--txt2);border:1px solid var(--line)}
 .btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold-b)}
-.btn-sm{padding:12px 16px;font-size:14px;width:auto;display:inline-block;margin:0 4px 0 0}
-input,select{width:100%;padding:16px;border-radius:10px;border:1px solid var(--line);background:#0a0805;color:var(--txt);font-size:17px;margin-bottom:10px;outline:none;font-family:inherit}
-input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.15)}
+.btn-sm{padding:10px 14px;font-size:13px;width:auto;display:inline-block;margin:0 4px 4px 0}
+input,select,textarea{width:100%;padding:16px;border-radius:10px;border:1px solid var(--line);background:#0a0805;color:var(--txt);font-size:17px;margin-bottom:10px;outline:none;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.15)}
 label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weight:600}
 .row{display:flex;gap:8px;margin-bottom:8px}.row>*{flex:1}
 .status-card{text-align:center;padding:16px;background:radial-gradient(circle at top,rgba(212,175,55,.08),transparent 60%),linear-gradient(145deg,var(--card),var(--card2))}
@@ -48,6 +47,7 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
 .badge-green{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.4)}
 .badge-yellow{background:rgba(251,191,36,.15);color:#fcd34d;border-color:rgba(251,191,36,.4)}
 .badge-red{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.4)}
+.badge-blue{background:rgba(56,189,248,.15);color:#7dd3fc;border-color:rgba(56,189,248,.4)}
 .route-strip{display:flex;overflow-x:auto;gap:10px;padding:12px 8px;background:#0a0805;border-radius:10px;border:1px solid var(--line);margin-top:10px;min-height:70px;align-items:center}
 .dot-node{flex:0 0 120px;text-align:center;font-size:12px;white-space:nowrap;padding:4px 0}
 .dot-node .dot{width:22px;height:22px;border-radius:50%;background:#2a2418;margin:0 auto 4px;border:2px solid #4a4232;transition:all .3s}
@@ -106,13 +106,12 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
 .del-btn{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;margin-left:auto}
 .admin-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
 .admin-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
-.admin-section h4{font-size:13px;color:var(--gold-b);font-weight:700;margin-bottom:8px;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center}
-.admin-list{font-size:13px;color:var(--txt2);line-height:1.7;max-height:220px;overflow-y:auto;background:#0a0805;padding:10px;border-radius:8px;border:1px solid var(--line)}
+.admin-section h4{font-size:13px;color:var(--gold-b);font-weight:700;margin-bottom:8px;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.admin-list{font-size:13px;color:#e5d7a8;line-height:1.7;max-height:240px;overflow-y:auto;background:linear-gradient(135deg,#252017,#1a150d);padding:12px;border-radius:10px;border:1px solid rgba(212,175,55,.3);box-shadow:inset 0 0 12px rgba(0,0,0,.5)}
 .admin-list .item{padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
 .admin-list .item:last-child{border-bottom:none}
 .admin-list .item b{color:var(--gold-b)}
 .wake-status{position:fixed;bottom:10px;left:10px;font-size:11px;color:var(--txt2);background:rgba(10,8,5,.9);padding:4px 10px;border-radius:8px;border:1px solid var(--line);z-index:5}
-/* 使用說明全屏頁 */
 .guide-screen{position:fixed;inset:0;background:linear-gradient(180deg,#0a0805,#1a150d);z-index:9500;display:none;flex-direction:column;overflow-y:auto;padding:20px}
 .guide-screen.active{display:flex}
 .guide-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:20px}
@@ -136,7 +135,6 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
 </div>
 
 <div class="container" id="app">
-  <!-- 登入 -->
   <div id="login-view" class="card">
     <div class="card-title">🔐 登入</div>
     <button class="btn btn-primary" onclick="googleLogin()">🅶 Google 帳號登入</button>
@@ -210,7 +208,7 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
       </div>
       <div class="card">
         <div class="card-title">🔄 循環線時段</div>
-        <div style="font-size:14px;color:var(--txt2);line-height:1.7">07:00 - 18:00 為循環線模式，無固定班次。乘客可直接留位，詳見「📋 留位總覽」下方循環線區域。</div>
+        <div style="font-size:14px;color:var(--txt2);line-height:1.7">循環線留位 24 小時開放，詳見「📋 留位總覽」下方。</div>
       </div>
     </div>
 
@@ -262,7 +260,7 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
       </div>
     </div>
 
-    <!-- 後台 -->
+    <!-- 後台（完整 20 個區塊） -->
     <div id="tab-admin" style="display:none">
       <div class="card">
         <div class="card-title">👑 <span id="admin-title">總管後台</span></div>
@@ -275,58 +273,173 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
           <div class="stat-box"><div class="label">🔄 循環</div><div class="value" id="ad-loop">0</div></div>
         </div>
       </div>
-      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0"><h4>🚐 在線車輛詳情 <button class="btn btn-outline btn-sm" onclick="refreshAdmin()">🔄</button></h4><div class="admin-list" id="ad-bus-list"></div></div></div>
-      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0"><h4>📊 今日留位統計</h4><div class="admin-list" id="ad-stats"></div></div></div>
-      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0"><h4>🎫 班次認領總覽</h4><div class="admin-list" id="ad-claim-list"></div></div></div>
-      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0"><h4>👥 乘客帳戶</h4><div class="admin-list" id="ad-pax-list"></div></div></div>
-      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0"><h4>💬 最近訊息</h4><div class="admin-list" id="ad-msg-list"></div></div></div>
-      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0"><h4>🎙️ 對講機記錄</h4><div class="admin-list" id="ad-walkie-list"></div></div></div>
-      <div class="card">
-        <div class="admin-section" style="border:none;padding:0;margin:0">
-          <h4>🚫 封禁名單</h4>
-          <div class="admin-list" id="ad-ban-list"></div>
-          <div class="row" style="margin-top:8px">
-            <input id="ad-ban-id" placeholder="UID / 電話" style="margin:0">
-            <button class="btn btn-danger btn-sm" onclick="addBan()" style="width:auto;flex:0 0 auto;margin:0">封禁</button>
-          </div>
+
+      <!-- 1. 在線車輛 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>🚐 在線車輛詳情 <button class="btn btn-outline btn-sm" onclick="refreshAdmin()">🔄</button></h4>
+        <div class="admin-list" id="ad-bus-list"></div>
+      </div></div>
+
+      <!-- 2. 今日留位統計 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>📊 今日留位統計</h4>
+        <div class="admin-list" id="ad-stats"></div>
+      </div></div>
+
+      <!-- 3. 班次認領總覽 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>🎫 班次認領總覽</h4>
+        <div class="admin-list" id="ad-claim-list"></div>
+      </div></div>
+
+      <!-- 4. 乘客帳戶 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>👥 乘客帳戶</h4>
+        <div class="admin-list" id="ad-pax-list"></div>
+      </div></div>
+
+      <!-- 5. 最近訊息 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>💬 最近訊息記錄 <button class="btn btn-danger btn-sm" onclick="clearAllMessages()">🗑️ 全清</button></h4>
+        <div class="admin-list" id="ad-msg-list"></div>
+      </div></div>
+
+      <!-- 6. 對講機記錄 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>🎙️ 對講機記錄 <button class="btn btn-danger btn-sm" onclick="clearAllWalkie()">🗑️ 全清</button></h4>
+        <div class="admin-list" id="ad-walkie-list"></div>
+      </div></div>
+
+      <!-- 7. 封禁名單 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>🚫 封禁名單</h4>
+        <div class="admin-list" id="ad-ban-list"></div>
+        <div class="row" style="margin-top:8px">
+          <input id="ad-ban-id" placeholder="UID / 電話" style="margin:0">
+          <button class="btn btn-danger btn-sm" onclick="addBan()" style="width:auto;flex:0 0 auto;margin:0">封禁</button>
         </div>
-      </div>
-      <div class="card">
-        <div class="admin-section" style="border:none;padding:0;margin:0">
-          <h4>📢 系統公告</h4>
-          <input id="ad-announce" placeholder="輸入公告內容">
-          <button class="btn btn-gold" onclick="publishAnnounce()">發佈公告</button>
-          <div class="admin-list" id="ad-announce-list" style="margin-top:8px"></div>
+      </div></div>
+
+      <!-- 8. 系統公告 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>📢 系統公告</h4>
+        <input id="ad-announce" placeholder="輸入公告內容">
+        <button class="btn btn-gold" onclick="publishAnnounce()">發佈公告</button>
+        <div class="admin-list" id="ad-announce-list" style="margin-top:8px"></div>
+      </div></div>
+
+      <!-- 9. 歷史數據 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>📈 歷史數據</h4>
+        <label>選擇日期</label>
+        <input type="date" id="ad-hist-date" onchange="loadHistory()">
+        <div class="admin-list" id="ad-hist-list"><div class="item">請選擇日期</div></div>
+      </div></div>
+
+      <!-- 10. 路線管理 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>🚏 路線管理</h4>
+        <div class="admin-list" id="ad-route-list"></div>
+        <label style="margin-top:8px">新增站點到目前路線</label>
+        <input id="ad-route-new" placeholder="站點名稱">
+        <button class="btn btn-gold btn-sm" onclick="addRouteStation()" style="width:100%">➕ 新增站點</button>
+      </div></div>
+
+      <!-- 11. 收費管理 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>💰 收費管理</h4>
+        <div class="row">
+          <input id="ad-fare-price" placeholder="票價 (HK$)" type="number">
+          <input id="ad-fare-note" placeholder="備註">
         </div>
-      </div>
+        <button class="btn btn-gold" onclick="saveFare()">💾 儲存票價</button>
+        <div class="admin-list" id="ad-fare-list" style="margin-top:8px"></div>
+      </div></div>
+
+      <!-- 12. 推送通知 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>📱 推送通知</h4>
+        <select id="ad-push-target">
+          <option value="all">📢 全部用戶</option>
+          <option value="drivers">🚐 只發給司機</option>
+          <option value="passengers">🧍 只發給乘客</option>
+        </select>
+        <input id="ad-push-text" placeholder="通知內容">
+        <button class="btn btn-gold" onclick="pushNotification()">📤 發送通知</button>
+      </div></div>
+
+      <!-- 13. 報表導出 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>📊 報表導出</h4>
+        <button class="btn btn-outline" onclick="exportCSV('bookings')">📥 導出今日留位 CSV</button>
+        <button class="btn btn-outline" onclick="exportCSV('loop')">📥 導出循環線 CSV</button>
+        <button class="btn btn-outline" onclick="exportCSV('buses')">📥 導出車輛 CSV</button>
+      </div></div>
+
+      <!-- 14. 乘客黑名單 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>👤 乘客黑名單（停權）</h4>
+        <div class="admin-list" id="ad-black-list"></div>
+        <div class="row" style="margin-top:8px">
+          <input id="ad-black-phone" placeholder="乘客電話" style="margin:0">
+          <button class="btn btn-danger btn-sm" onclick="addBlacklist()" style="width:auto;flex:0 0 auto;margin:0">停權</button>
+        </div>
+      </div></div>
+
+      <!-- 15. 班次時間管理 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>🎫 班次時間管理</h4>
+        <label>新增班次（例如 06:55）</label>
+        <input id="ad-shift-new" placeholder="HH:MM">
+        <button class="btn btn-gold btn-sm" onclick="addShift()" style="width:100%">➕ 新增班次</button>
+        <div class="admin-list" id="ad-shift-list" style="margin-top:8px"></div>
+      </div></div>
+
+      <!-- 16. 車輛管理 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>🚐 車輛管理</h4>
+        <div class="admin-list" id="ad-vehicle-list"></div>
+        <div class="row" style="margin-top:8px">
+          <input id="ad-vehicle-plate" placeholder="車牌" style="margin:0">
+          <input id="ad-vehicle-seats" placeholder="座位" type="number" style="margin:0">
+          <button class="btn btn-gold btn-sm" onclick="addVehicle()" style="width:auto;flex:0 0 auto;margin:0">新增</button>
+        </div>
+      </div></div>
+
+      <!-- 17. GPS 軌跡記錄 -->
+      <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+        <h4>📍 GPS 軌跡記錄</h4>
+        <div class="admin-list" id="ad-gps-list"><div class="item">暫無記錄</div></div>
+      </div></div>
+
+      <!-- 18. 管理員管理（超管） -->
       <div id="super-only-panel" style="display:none">
-        <div class="card">
-          <div class="admin-section" style="border:none;padding:0;margin:0">
-            <h4>👑 管理員管理（超管專屬）</h4>
-            <label>新增管理員電郵</label>
-            <input id="new-admin-email" placeholder="example@gmail.com">
-            <label>權限級別</label>
-            <select id="new-admin-super">
-              <option value="false">普通管理員</option>
-              <option value="true">超級管理員</option>
-            </select>
-            <button class="btn btn-gold" onclick="addAdmin()">➕ 新增管理員</button>
-            <div class="admin-list" id="admin-list" style="margin-top:10px"></div>
+        <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+          <h4>👑 管理員管理（超管專屬）</h4>
+          <label>新增管理員電郵</label>
+          <input id="new-admin-email" placeholder="example@gmail.com">
+          <label>權限級別</label>
+          <select id="new-admin-super">
+            <option value="false">普通管理員</option>
+            <option value="true">超級管理員</option>
+          </select>
+          <button class="btn btn-gold" onclick="addAdmin()">➕ 新增管理員</button>
+          <div class="admin-list" id="admin-list" style="margin-top:10px">
+            <div class="item" style="color:var(--txt2);text-align:center;padding:12px">載入中…</div>
           </div>
-        </div>
-        <div class="card">
-          <div class="admin-section" style="border:none;padding:0;margin:0">
-            <h4>🔥 超管專屬操作</h4>
-            <button class="btn btn-danger" onclick="clearTodayBookings()">🗑️ 清除今日所有留位</button>
-            <button class="btn btn-danger" onclick="clearAllBuses()">🗑️ 強制離線所有車輛</button>
-          </div>
-        </div>
+        </div></div>
+
+        <!-- 19. 超管專屬操作 -->
+        <div class="card"><div class="admin-section" style="border:none;padding:0;margin:0">
+          <h4>🔥 超管專屬操作</h4>
+          <button class="btn btn-danger" onclick="clearTodayBookings()">🗑️ 清除今日所有留位</button>
+          <button class="btn btn-danger" onclick="clearAllBuses()">🗑️ 強制離線所有車輛</button>
+        </div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- 通知彈窗 -->
 <div class="modal" id="notif-modal">
   <div class="modal-card notif-card">
     <h2 id="notif-title">🔔 新通知</h2>
@@ -335,7 +448,6 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
   </div>
 </div>
 
-<!-- 使用說明全屏頁 -->
 <div class="guide-screen" id="guide-screen">
   <div class="guide-header">
     <h2>📖 司機使用說明</h2>
@@ -365,8 +477,8 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-const SM = ['06:20','06:30','06:40','06:50'];
-const SE = ['18:15','18:30','18:45','19:00','19:15','19:30','19:45','20:00','20:20'];
+let SM = ['06:20','06:30','06:40','06:50'];
+let SE = ['18:15','18:30','18:45','19:00','19:15','19:30','19:45','20:00','20:20'];
 
 const ROUTES = {
   busy: {
@@ -478,25 +590,22 @@ const DRIVER_GUIDE = [
   "首先，你可以用 Google 帳號登入，或者輸入電話號碼或管理員電郵登入。",
   "登入後，請到「當值」分頁，輸入你嘅車牌號碼，然後撳「設定」。",
   "撳「開始當值」，系統會自動啟動 GPS 定位，當你到達每個站嗰陣，會自動語音報站。",
-  "如果你要手動調站，可以撳「上一站」或者「下一站」。",
+  "如果你想手動調站，可以撳「上一站」或者「下一站」。",
   "之後請到「班次認領」分頁，認領你今日負責嘅班次時間。認領後，乘客就會喺佢哋嘅介面見到你嘅車牌。",
   "到「留位總覽」分頁，你可以睇到座位圖，知道邊個位留咗，邊個位空。",
+  "循環線留位 24 小時開放，你可以喺「留位總覽」下方睇到。",
   "當有乘客留位或者發訊息畀你，系統會彈出通知同發出聲音，提你處理。",
   "如果需要同其他司機通話，可以到「對講機」分頁錄製語音。",
   "如果係管理員或超級管理員，你仲可以喺「後台」分頁睇到營運數據、發佈公告、管理乘客同司機。",
   "多謝使用浚鍵管理有限公司司機專業端，祝你行車安全，一路順風。"
 ];
 
-let guidePlaying = false;
-let guideIdx = 0;
-let guideTimer = null;
-
+let guidePlaying=false,guideIdx=0,guideTimer=null;
 function openGuide(){
   $('guide-screen').classList.add('active');
   renderGuide();
-  guideIdx = 0;
-  guidePlaying = false;
-  $('guide-play-btn').textContent = '▶️ 開始播放';
+  guideIdx=0;guidePlaying=false;
+  $('guide-play-btn').textContent='▶️ 開始播放';
 }
 function closeGuide(){
   if(window.speechSynthesis)window.speechSynthesis.cancel();
@@ -505,8 +614,7 @@ function closeGuide(){
   $('guide-screen').classList.remove('active');
 }
 function renderGuide(){
-  const c=$('guide-content');
-  c.innerHTML = DRIVER_GUIDE.map((line,i)=>`<div class="guide-line" id="gl-${i}">${esc(line)}</div>`).join('');
+  $('guide-content').innerHTML=DRIVER_GUIDE.map((line,i)=>`<div class="guide-line" id="gl-${i}">${esc(line)}</div>`).join('');
 }
 function toggleGuidePlay(){
   if(guidePlaying){
@@ -522,26 +630,18 @@ function toggleGuidePlay(){
 }
 function playNextGuideLine(){
   if(!guidePlaying)return;
-  if(guideIdx >= DRIVER_GUIDE.length){
-    guidePlaying=false;
-    $('guide-play-btn').textContent='🔄 重新播放';
-    guideIdx = 0;
-    return;
+  if(guideIdx>=DRIVER_GUIDE.length){
+    guidePlaying=false;$('guide-play-btn').textContent='🔄 重新播放';guideIdx=0;return;
   }
-  // 移除上一個 active
   document.querySelectorAll('.guide-line').forEach(el=>el.classList.remove('active'));
-  const el = document.getElementById('gl-'+guideIdx);
-  if(el){
-    el.classList.add('active');
-    el.scrollIntoView({behavior:'smooth',block:'center'});
-  }
-  const text = DRIVER_GUIDE[guideIdx];
-  speak(text, ()=>{
+  const el=$('gl-'+guideIdx);
+  if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'center'});}
+  speak(DRIVER_GUIDE[guideIdx],()=>{
     if(!guidePlaying)return;
-    const cur = document.getElementById('gl-'+guideIdx);
+    const cur=$('gl-'+guideIdx);
     if(cur)cur.classList.add('done');
     guideIdx++;
-    guideTimer = setTimeout(playNextGuideLine, 500);
+    guideTimer=setTimeout(playNextGuideLine,500);
   });
 }
 
@@ -591,7 +691,25 @@ const RecorderManager={
   },
   get(id){return this.instances[id];}
 };
-function playAudio(b64){if(!b64)return;try{const a=new Audio('data:audio/webm;base64,'+b64);a.volume=1;a.play().catch(()=>{});}catch(e){}}
+
+/* 🎵 音量 7 倍 */
+async function playAudio(b64){
+  if(!b64)return;
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    const buf=await ctx.decodeAudioData(bytes.buffer);
+    const src=ctx.createBufferSource();
+    src.buffer=buf;
+    const gain=ctx.createGain();
+    gain.gain.value=7;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(0);
+  }catch(e){
+    try{const a=new Audio('data:audio/webm;base64,'+b64);a.volume=1;a.play().catch(()=>{});}catch(e2){}
+  }
+}
 
 async function checkUserRole(email){
   if(!email)return{role:'driver',super:false};
@@ -608,7 +726,6 @@ async function checkUserRole(email){
   return{role:'driver',super:false};
 }
 
-/* Google 登入 */
 async function googleLogin(){
   try{
     const provider=new firebase.auth.GoogleAuthProvider();
@@ -683,6 +800,7 @@ function initDriver(){
   startBookingListener();
   startMsgListener();
   startWalkieListener();
+  loadDynamicShifts();
   if(isAdmin)startAdminListeners();
 }
 
@@ -768,7 +886,6 @@ function updateDB(){
   updateUI();
 }
 
-/* GPS */
 async function requestWakeLock(){
   try{
     if('wakeLock' in navigator){
@@ -822,6 +939,9 @@ function startGpsWatch(){
     }
     lastPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
     lastPosTime=n;
+    db.ref('van/gps_log/'+getToday()+'/'+driverData.plate).push({
+      lat:pos.coords.latitude,lng:pos.coords.longitude,time:now()
+    }).catch(()=>{});
     const coords=getCoords();
     const route=getRoute();
     if(!coords||!coords.length)return;
@@ -970,7 +1090,14 @@ function toggleFull(){
   updateDB();
 }
 
-/* 班次認領 */
+function loadDynamicShifts(){
+  db.ref('config/shifts').on('value',s=>{
+    const d=s.val()||{};
+    if(d.morning&&d.morning.length)SM=d.morning;
+    if(d.evening&&d.evening.length)SE=d.evening;
+    renderShiftList();
+  });
+}
 function loadShiftClaims(){
   if(shiftRef){try{shiftRef.off();}catch(e){}}
   shiftRef=db.ref('booking_seats/'+getToday());
@@ -1023,7 +1150,6 @@ async function unclaimShift(tm){
   }catch(e){toast('❌ '+e.message);}
 }
 
-/* 座位圖 */
 function renderSeatView(){
   const sel=$('seat-shift-select');
   const view=$('seat-view');
@@ -1072,7 +1198,6 @@ function renderSeatView(){
   view.innerHTML=h;
 }
 
-/* 循環線留位（改靚） */
 function renderLoopBookings(){
   const c=$('loop-bookings');
   if(!c)return;
@@ -1081,7 +1206,7 @@ function renderLoopBookings(){
   $('loop-pending-count').textContent=lp.length+' 待確認';
   let h='';
   if(!lp.length&&!lr.length){
-    c.innerHTML='<div style="text-align:center;color:var(--txt2);padding:24px;font-size:14px;background:linear-gradient(135deg,rgba(56,189,248,.04),transparent);border-radius:10px">🔄 暫無循環線留位<br><span style="font-size:12px">07:00 - 18:00 期間乘客可留位</span></div>';
+    c.innerHTML='<div style="text-align:center;color:var(--txt2);padding:24px;font-size:14px;background:linear-gradient(135deg,rgba(56,189,248,.04),transparent);border-radius:10px">🔄 暫無循環線留位<br><span style="font-size:12px">24 小時開放</span></div>';
     return;
   }
   if(lp.length){
@@ -1106,7 +1231,6 @@ function renderLoopBookings(){
   c.innerHTML=h;
 }
 
-/* 留位監聽 */
 function startBookingListener(){
   const t=getToday();
   if(bookingRef){try{bookingRef.off();}catch(e){}}
@@ -1170,7 +1294,6 @@ async function rejectLoop(id){
   catch(e){toast('❌ '+e.message);}
 }
 
-/* 訊息 + 刪除權限 */
 function startMsgListener(){
   if(msgRef){try{msgRef.off();}catch(e){}}
   msgRef=db.ref('van/messages').orderByChild('timestamp').limitToLast(60);
@@ -1192,11 +1315,8 @@ function startMsgListener(){
 }
 function canDeleteMsg(m){
   if(!m)return false;
-  // 管理員 / 超管可以刪除任何訊息
   if(isAdmin)return true;
-  // 自己發嘅可以刪除
   if(m.senderUid===currentUser.uid)return true;
-  // 司機可以刪除發俾自己車牌嘅訊息
   if(driverData.plate&&m.busId===driverData.plate)return true;
   return false;
 }
@@ -1244,7 +1364,6 @@ function setupMsgRecorder(){
 function stopMsgRecord(){const rec=RecorderManager.get('msg');if(rec&&rec.isRecording())rec.stop();$('msg-record-controls').style.display='none';$('btn-msg-record').style.display='block';}
 function cancelMsgRecord(){const rec=RecorderManager.get('msg');if(rec&&rec.isRecording())rec.cancel();$('msg-record-controls').style.display='none';$('btn-msg-record').style.display='block';}
 
-/* 對講機 + 刪除權限 */
 function startWalkieListener(){
   if(walkieRef){try{walkieRef.off();}catch(e){}}
   walkieRef=db.ref('van/walkie_talkie').orderByChild('timestamp').limitToLast(40);
@@ -1354,9 +1473,48 @@ function startAdminListeners(){
     });
     $('ad-pax-list').innerHTML=h||'<div class="item">暫無乘客</div>';
   });
+  db.ref('booking_blacklist').on('value',snap=>{
+    const d=snap.val()||{};let h='';
+    Object.keys(d).forEach(k=>{h+='<div class="item">🚫 '+esc(k)+' <button class="btn btn-outline btn-sm" onclick="removeBlacklist(\''+k+'\')">解除</button></div>';});
+    $('ad-black-list').innerHTML=h||'<div class="item">無停權記錄</div>';
+  });
+  db.ref('config/fare').on('value',snap=>{
+    const d=snap.val()||{};
+    $('ad-fare-list').innerHTML='<div class="item">目前票價：<b>HK$ '+(d.price||'未設定')+'</b> · '+(d.note||'')+'</div>';
+  });
+  db.ref('config/vehicles').on('value',snap=>{
+    const d=snap.val()||{};let h='';
+    Object.keys(d).forEach(k=>{const v=d[k];h+='<div class="item">🚐 <b>'+esc(k)+'</b> · '+v.seats+' 座 <button class="btn btn-danger btn-sm" onclick="removeVehicle(\''+k+'\')">刪除</button></div>';});
+    $('ad-vehicle-list').innerHTML=h||'<div class="item">暫無車輛</div>';
+  });
+  db.ref('config/shifts').on('value',snap=>{
+    const d=snap.val()||{};
+    const m=d.morning||SM;
+    const e=d.evening||SE;
+    let h='<div class="item"><b>早上：</b>'+m.join(', ')+'</div><div class="item"><b>傍晚：</b>'+e.join(', ')+'</div>';
+    $('ad-shift-list').innerHTML=h;
+  });
+  db.ref('van/gps_log').on('value',snap=>{
+    const d=snap.val()||{};let h='';
+    const dates=Object.keys(d).slice(-1);
+    dates.forEach(date=>{
+      Object.keys(d[date]).forEach(plate=>{
+        const pts=Object.values(d[date][plate]);
+        h+='<div class="item">📍 <b>'+esc(plate)+'</b> · '+date+' · '+pts.length+' 點</div>';
+      });
+    });
+    $('ad-gps-list').innerHTML=h||'<div class="item">暫無 GPS 記錄</div>';
+  });
+  db.ref('config/routes').on('value',snap=>{
+    const d=snap.val()||{};
+    let h='<div class="item"><b>西鐵快線：</b>'+ROUTES.busy.go.name.join(' → ')+'</div>';
+    h+='<div class="item"><b>市中心循環線：</b>'+ROUTES.normal.go.name.join(' → ')+'</div>';
+    $('ad-route-list').innerHTML=h;
+  });
   updateAdminStats();
   setInterval(updateAdminStats,30000);
 }
+
 async function adminDeleteMsg(key){
   if(!isAdmin)return toast('❌ 冇權限');
   if(!confirm('確定刪除此訊息？'))return;
@@ -1369,6 +1527,19 @@ async function adminDeleteWalkie(key){
   await db.ref('van/walkie_talkie/'+key).remove();
   toast('✅ 已刪除');
 }
+async function clearAllMessages(){
+  if(!isSuperAdmin)return toast('❌ 只有超管可全清');
+  if(!confirm('⚠️ 確定清除所有訊息記錄？'))return;
+  await db.ref('van/messages').remove();
+  toast('✅ 已清除');
+}
+async function clearAllWalkie(){
+  if(!isSuperAdmin)return toast('❌ 只有超管可全清');
+  if(!confirm('⚠️ 確定清除所有對講機記錄？'))return;
+  await db.ref('van/walkie_talkie').remove();
+  toast('✅ 已清除');
+}
+
 async function updateAdminStats(){
   try{
     const t=getToday();
@@ -1415,6 +1586,125 @@ async function addBan(){
 async function removeBan(k){
   if(!confirm('確定解除封禁？'))return;
   await db.ref('bans/'+k).remove();toast('已解除');
+}
+
+/* 歷史數據 */
+async function loadHistory(){
+  const date=$('ad-hist-date').value;
+  if(!date)return;
+  const bs=(await db.ref('booking/'+date).once('value')).val()||{};
+  const lp=(await db.ref('booking_loop/'+date).once('value')).val()||{};
+  let pending=0,reserved=0,boarded=0,rejected=0,cancelled=0;
+  Object.values(bs).forEach(b=>{
+    if(b.status==='pending')pending++;
+    else if(b.status==='reserved')reserved++;
+    else if(b.status==='boarded')boarded++;
+    else if(b.status==='rejected')rejected++;
+    else if(b.status==='cancelled')cancelled++;
+  });
+  let h='';
+  h+='<div class="item">📅 '+date+'</div>';
+  h+='<div class="item">📋 固定班次：<b>'+Object.keys(bs).length+'</b> 筆</div>';
+  h+='<div class="item">⏳ 待確認：<b>'+pending+'</b> · ✅ 已確認：<b>'+reserved+'</b> · 🚐 已上車：<b>'+boarded+'</b></div>';
+  h+='<div class="item">❌ 已拒絕：<b>'+rejected+'</b> · 🚫 已取消：<b>'+cancelled+'</b></div>';
+  h+='<div class="item">🔄 循環線：<b>'+Object.keys(lp).length+'</b> 筆</div>';
+  $('ad-hist-list').innerHTML=h;
+}
+
+/* 路線管理 */
+async function addRouteStation(){
+  const name=$('ad-route-new').value.trim();
+  if(!name)return toast('請輸入站點名稱');
+  await db.ref('config/routes/extra').push({name,addedBy:currentUser.identifier,addedAt:now()});
+  $('ad-route-new').value='';
+  toast('✅ 已新增站點');
+}
+
+/* 收費管理 */
+async function saveFare(){
+  const price=parseFloat($('ad-fare-price').value);
+  const note=$('ad-fare-note').value.trim();
+  if(isNaN(price))return toast('請輸入有效票價');
+  await db.ref('config/fare').set({price,note,updatedBy:currentUser.identifier,updatedAt:now()});
+  toast('✅ 票價已儲存');
+}
+
+/* 推送通知 */
+async function pushNotification(){
+  const target=$('ad-push-target').value;
+  const text=$('ad-push-text').value.trim();
+  if(!text)return toast('請輸入通知內容');
+  await db.ref('van/notifications').push({target,text,publisher:currentUser.identifier,timestamp:now()});
+  $('ad-push-text').value='';
+  toast('✅ 通知已發送');
+}
+
+/* 報表導出 */
+async function exportCSV(type){
+  const t=getToday();
+  let data={},fname='';
+  if(type==='bookings'){data=(await db.ref('booking/'+t).once('value')).val()||{};fname='bookings_'+t+'.csv';}
+  else if(type==='loop'){data=(await db.ref('booking_loop/'+t).once('value')).val()||{};fname='loop_'+t+'.csv';}
+  else if(type==='buses'){data=(await db.ref('van/active_buses').once('value')).val()||{};fname='buses_'+t+'.csv';}
+  let csv='\uFEFF';
+  const arr=Object.values(data);
+  if(arr.length){
+    const keys=Object.keys(arr[0]);
+    csv+=keys.join(',')+'\n';
+    arr.forEach(row=>{
+      csv+=keys.map(k=>'"'+String(row[k]||'').replace(/"/g,'""')+'"').join(',')+'\n';
+    });
+  }
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fname;
+  a.click();
+  toast('✅ 已導出 '+fname);
+}
+
+/* 乘客黑名單 */
+async function addBlacklist(){
+  const phone=$('ad-black-phone').value.trim();
+  if(!phone)return toast('請輸入電話');
+  await db.ref('booking_blacklist/'+phone).set({reason:'管理員停權',bannedBy:currentUser.identifier,at:now()});
+  $('ad-black-phone').value='';
+  toast('✅ 已停權');
+}
+async function removeBlacklist(k){
+  if(!confirm('確定解除停權？'))return;
+  await db.ref('booking_blacklist/'+k).remove();
+  toast('已解除');
+}
+
+/* 班次時間管理 */
+async function addShift(){
+  const tm=$('ad-shift-new').value.trim();
+  if(!/^\d{2}:\d{2}$/.test(tm))return toast('格式：HH:MM');
+  const morning=await db.ref('config/shifts/morning').once('value');
+  const evening=await db.ref('config/shifts/evening').once('value');
+  let m=morning.val()||SM,e=evening.val()||SE;
+  const hour=parseInt(tm.split(':')[0]);
+  if(hour<12){if(!m.includes(tm))m.push(tm);m.sort();}
+  else{if(!e.includes(tm))e.push(tm);e.sort();}
+  await db.ref('config/shifts').set({morning:m,evening:e});
+  $('ad-shift-new').value='';
+  toast('✅ 已新增班次 '+tm);
+}
+
+/* 車輛管理 */
+async function addVehicle(){
+  const plate=$('ad-vehicle-plate').value.trim().toUpperCase();
+  const seats=parseInt($('ad-vehicle-seats').value)||16;
+  if(!plate)return toast('請輸入車牌');
+  await db.ref('config/vehicles/'+plate).set({plate,seats,addedBy:currentUser.identifier,addedAt:now()});
+  $('ad-vehicle-plate').value='';$('ad-vehicle-seats').value='';
+  toast('✅ 已新增車輛');
+}
+async function removeVehicle(k){
+  if(!confirm('確定刪除此車輛？'))return;
+  await db.ref('config/vehicles/'+k).remove();
+  toast('已刪除');
 }
 
 /* 管理員管理 */
@@ -1472,7 +1762,7 @@ async function loadAdminList(){
       (!isMe?'<button class="btn btn-danger btn-sm" onclick="removeAdmin(\''+k+'\')" style="margin:0">移除</button>':'')+
     '</div>';
   });
-  $('admin-list').innerHTML=h||'<div class="item">暫無管理員</div>';
+  $('admin-list').innerHTML=h||'<div class="item" style="color:var(--gold-b);text-align:center;padding:12px">暫無管理員</div>';
 }
 async function clearTodayBookings(){
   if(!isSuperAdmin)return toast('❌ 只有超級管理員');
@@ -1488,7 +1778,6 @@ async function clearAllBuses(){
   toast('✅ 已清除');
 }
 
-/* Tab */
 function switchTab(t){
   ['duty','claim','seats','msg','walkie','admin'].forEach(k=>{
     const p=$('tab-'+k);if(p)p.style.display=(k===t?'block':'none');
@@ -1540,7 +1829,7 @@ document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&driverData.isActive&&!gpsWatchId)startGpsWatch();
 });
 
-Object.assign(window,{playAudio,closeNotif,setPlate,startDuty,stopDuty,nextStation,prevStation,switchDir,addPass,subPass,toggleFull,claimShift,unclaimShift,confirmBooking,rejectBooking,confirmLoop,rejectLoop,sendMsg,stopMsgRecord,cancelMsgRecord,stopWalkieRecord,cancelWalkieRecord,publishAnnounce,doLogin,googleLogin,switchTab,renderSeatView,renderLoopBookings,toggleVoice,toggleMode,addBan,removeBan,addAdmin,removeAdmin,toggleSuper,clearTodayBookings,clearAllBuses,refreshAdmin,deleteMsg,deleteWalkie,adminDeleteMsg,adminDeleteWalkie,openGuide,closeGuide,toggleGuidePlay});
+Object.assign(window,{playAudio,closeNotif,setPlate,startDuty,stopDuty,nextStation,prevStation,switchDir,addPass,subPass,toggleFull,claimShift,unclaimShift,confirmBooking,rejectBooking,confirmLoop,rejectLoop,sendMsg,stopMsgRecord,cancelMsgRecord,stopWalkieRecord,cancelWalkieRecord,publishAnnounce,doLogin,googleLogin,switchTab,renderSeatView,renderLoopBookings,toggleVoice,toggleMode,addBan,removeBan,addAdmin,removeAdmin,toggleSuper,clearTodayBookings,clearAllBuses,refreshAdmin,deleteMsg,deleteWalkie,adminDeleteMsg,adminDeleteWalkie,openGuide,closeGuide,toggleGuidePlay,loadHistory,addRouteStation,saveFare,pushNotification,exportCSV,addBlacklist,removeBlacklist,addShift,addVehicle,removeVehicle,clearAllMessages,clearAllWalkie});
 </script>
 </body>
 </html>
