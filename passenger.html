@@ -13,11 +13,12 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#0a0805,#14100a);color:var(--txt);min-height:100vh;padding-bottom:20px}
 .header{position:sticky;top:0;background:linear-gradient(135deg,#1a150d,#0a0805);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.6)}
 .header h1{font-size:15px;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;letter-spacing:.5px}
-.header a,.header button{color:var(--gold);text-decoration:none;font-size:12px;background:transparent;border:1px solid var(--line);padding:6px 10px;border-radius:8px;cursor:pointer;font-family:inherit;margin-left:4px}
+.header a,.header button{color:var(--gold);text-decoration:none;font-size:13px;background:transparent;border:1px solid var(--line);padding:8px 12px;border-radius:8px;cursor:pointer;font-family:inherit;margin-left:4px}
 .container{padding:14px;max-width:640px;margin:0 auto}
 .card{background:linear-gradient(145deg,var(--card),var(--card2));border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--line);box-shadow:0 4px 20px rgba(0,0,0,.4)}
-.card-title{font-size:14px;font-weight:700;color:var(--gold-b);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-.btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:8px;transition:all .15s;text-align:center;font-family:inherit}
+.card-title{font-size:16px;font-weight:700;color:var(--gold-b);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+/* 按鈕加大 */
+.btn{width:100%;padding:19px;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:10px;transition:all .15s;text-align:center;font-family:inherit;letter-spacing:.3px}
 .btn:active{transform:scale(.98);opacity:.85}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-gold{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;box-shadow:0 4px 14px rgba(212,175,55,.35)}
@@ -27,62 +28,64 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .btn-warn{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a150d}
 .btn-secondary{background:#1e1a12;color:var(--txt2);border:1px solid var(--line)}
 .btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold-b)}
-.btn-sm{padding:7px 12px;font-size:12px;width:auto;display:inline-block;margin:0 3px 0 0}
-input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0a0805;color:var(--txt);font-size:15px;margin-bottom:10px;outline:none;font-family:inherit}
+.btn-sm{padding:12px 16px;font-size:14px;width:auto;display:inline-block;margin:0 4px 0 0}
+input,select{width:100%;padding:16px;border-radius:10px;border:1px solid var(--line);background:#0a0805;color:var(--txt);font-size:17px;margin-bottom:10px;outline:none;font-family:inherit}
 input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.15)}
-label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weight:600}
+label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weight:600}
 .row{display:flex;gap:8px;margin-bottom:8px}.row>*{flex:1}
 .tab-bar{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
-.tab-btn{flex:1;min-width:80px;padding:10px 6px;background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;white-space:nowrap}
+.tab-btn{flex:1;min-width:80px;padding:14px 8px;background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:12px;cursor:pointer;font-size:15px;font-weight:700;font-family:inherit;white-space:nowrap}
 .tab-btn.active{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;border-color:transparent;box-shadow:0 4px 14px rgba(212,175,55,.35)}
-.pax-card{background:#0a0805;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid var(--line);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s}
+.pax-card{background:#0a0805;border-radius:12px;padding:16px;margin-bottom:10px;border:1px solid var(--line);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s}
 .pax-card:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(212,175,55,.15)}
-.pax-card .time{font-size:20px;font-weight:900;color:var(--gold-b);letter-spacing:1px}
-.pax-card .info{font-size:11px;color:var(--txt2);margin-top:2px}
-.pax-card .plate{font-size:12px;color:var(--green);font-weight:700;margin-top:4px}
+.pax-card .time{font-size:24px;font-weight:900;color:var(--gold-b);letter-spacing:1px}
+.pax-card .info{font-size:13px;color:var(--txt2);margin-top:4px}
+.pax-card .plate{font-size:14px;color:var(--green);font-weight:700;margin-top:6px}
 .pax-card .plate.wait{color:var(--txt2)}
-.pax-card .num{font-size:22px;font-weight:800;color:var(--gold-b)}
+.pax-card .num{font-size:26px;font-weight:800;color:var(--gold-b)}
 .pax-card.full{opacity:.55}
 .pax-card.full .num{color:var(--red)}
-.my-booking{background:#0a0805;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid var(--gold)}
+.my-booking{background:#0a0805;border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid var(--gold)}
 .my-booking.reserved{border-left-color:var(--green)}
 .my-booking.boarded{border-left-color:#0ea5e9}
 .my-booking.pending{border-left-color:var(--yellow)}
 .my-booking.rejected{border-left-color:var(--red)}
-.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-weight:700;font-size:11px;margin:2px;border:1px solid}
+.badge{display:inline-block;padding:5px 12px;border-radius:14px;font-weight:700;font-size:13px;margin:2px;border:1px solid}
 .badge-gold{background:rgba(212,175,55,.15);color:var(--gold-b);border-color:rgba(212,175,55,.4)}
 .badge-green{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.4)}
 .badge-yellow{background:rgba(251,191,36,.15);color:#fcd34d;border-color:rgba(251,191,36,.4)}
 .badge-blue{background:rgba(56,189,248,.15);color:#7dd3fc;border-color:rgba(56,189,248,.4)}
 .badge-red{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.4)}
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a150d,#0a0805);color:var(--gold-b);padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s;border:1px solid var(--gold);pointer-events:none;max-width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a150d,#0a0805);color:var(--gold-b);padding:14px 24px;border-radius:10px;font-size:15px;z-index:9999;opacity:0;transition:opacity .3s;border:1px solid var(--gold);pointer-events:none;max-width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.6)}
 .toast.show{opacity:1}
 .rec-controls{display:none;gap:6px;margin-top:8px}
-.rec-controls button{flex:1;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit}
+.rec-controls button{flex:1;padding:14px;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit}
 .rec-stop{background:linear-gradient(135deg,#16a34a,#15803d)}
 .rec-cancel{background:linear-gradient(135deg,#dc2626,#991b1b)}
-.rec-status{display:none;align-items:center;gap:8px;padding:8px;background:#0a0805;border-radius:8px;margin-top:8px;font-size:13px;color:var(--gold-b);border:1px solid var(--line)}
-.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse .6s infinite}
+.rec-status{display:none;align-items:center;gap:8px;padding:10px;background:#0a0805;border-radius:8px;margin-top:8px;font-size:14px;color:var(--gold-b);border:1px solid var(--line)}
+.rec-dot{width:10px;height:10px;border-radius:50%;background:var(--red);animation:pulse .6s infinite}
 @keyframes pulse{50%{opacity:.3}}
-.bus-card{background:#0a0805;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid var(--line)}
-.play-audio{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700}
-.msg-row{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.bus-card{background:#0a0805;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--line)}
+.play-audio{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700}
+.del-btn{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;margin-left:auto}
+.msg-row{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.msg-row:last-child{border-bottom:none}
 .route-strip{display:flex;overflow-x:auto;gap:12px;padding:14px 8px;background:rgba(0,0,0,.4);border-radius:12px;border:1px solid var(--line);min-height:80px;align-items:center;scroll-behavior:smooth}
-.dot-node{flex:0 0 130px;text-align:center;font-size:12px;white-space:nowrap;padding:4px 0}
-.dot-node .dot{width:22px;height:22px;border-radius:50%;background:#2a2418;margin:0 auto 6px;border:2px solid #4a4232;transition:all .3s}
+.dot-node{flex:0 0 130px;text-align:center;font-size:13px;white-space:nowrap;padding:4px 0}
+.dot-node .dot{width:24px;height:24px;border-radius:50%;background:#2a2418;margin:0 auto 6px;border:2px solid #4a4232;transition:all .3s}
 .dot-node .nm{color:var(--txt2)}
 .dot-node.current .dot{background:var(--green);border-color:#f5d76e;box-shadow:0 0 18px var(--green),0 0 30px rgba(34,197,94,.5);transform:scale(1.2)}
-.dot-node.current .nm{color:#86efac;font-weight:900;font-size:13px}
+.dot-node.current .nm{color:#86efac;font-weight:900;font-size:14px}
 .dot-node.next .dot{background:var(--green);border-color:#f5d76e;animation:blink .8s infinite;box-shadow:0 0 14px var(--green)}
 .dot-node.next .nm{color:#86efac;font-weight:700}
 .dot-node.passed .dot{background:#4a4232;opacity:.4}
 .dot-node.passed .nm{color:#5a5240}
 @keyframes blink{50%{opacity:.35;transform:scale(.85)}}
 .track-header{text-align:center;padding:10px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
-.track-plate{font-size:22px;font-weight:900;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
-.track-station{font-size:18px;font-weight:800;color:var(--green);margin:6px 0;text-shadow:0 0 12px rgba(34,197,94,.4)}
-.track-next{font-size:13px;color:var(--gold-b)}
-.track-count{font-size:32px;font-weight:900;color:var(--gold-b);margin:4px 0;text-shadow:0 0 20px rgba(212,175,55,.4)}
+.track-plate{font-size:24px;font-weight:900;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
+.track-station{font-size:20px;font-weight:800;color:var(--green);margin:6px 0;text-shadow:0 0 12px rgba(34,197,94,.4)}
+.track-next{font-size:15px;color:var(--gold-b)}
+.track-count{font-size:36px;font-weight:900;color:var(--gold-b);margin:4px 0;text-shadow:0 0 20px rgba(212,175,55,.4)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
 .modal.active{display:flex}
 .modal-card{background:linear-gradient(145deg,#1a150d,#0a0805);border-radius:20px;padding:22px;max-width:400px;width:100%;border:2px solid var(--gold);box-shadow:0 20px 60px rgba(212,175,55,.35);max-height:90vh;overflow-y:auto}
@@ -90,13 +93,27 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
 .notif-card{border-color:var(--gold-b);animation:goldPulse .8s ease-in-out infinite alternate}
 @keyframes goldPulse{from{box-shadow:0 0 20px rgba(212,175,55,.4)}to{box-shadow:0 0 50px rgba(212,175,55,.9)}}
 .notif-body{font-size:15px;line-height:1.6;color:var(--txt);margin:14px 0}
-.stat-box{background:#0a0805;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;flex:1}
-.stat-box .label{font-size:11px;color:var(--txt2)}
-.stat-box .value{font-size:20px;font-weight:900;color:var(--gold-b);margin-top:2px}
-.admin-list{font-size:12px;color:var(--txt2);line-height:1.7;max-height:200px;overflow-y:auto;background:#0a0805;padding:8px;border-radius:8px;border:1px solid var(--line)}
-.admin-list .item{padding:5px 0;border-bottom:1px solid var(--line)}
+.stat-box{background:#0a0805;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;flex:1}
+.stat-box .label{font-size:12px;color:var(--txt2)}
+.stat-box .value{font-size:22px;font-weight:900;color:var(--gold-b);margin-top:2px}
+.admin-list{font-size:13px;color:var(--txt2);line-height:1.7;max-height:200px;overflow-y:auto;background:#0a0805;padding:10px;border-radius:8px;border:1px solid var(--line)}
+.admin-list .item{padding:6px 0;border-bottom:1px solid var(--line)}
 .admin-list .item:last-child{border-bottom:none}
 .admin-list .item b{color:var(--gold-b)}
+/* 循環線靚卡片 */
+.loop-pending{background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 4px 20px rgba(251,191,36,.1)}
+.loop-reserved{background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 4px 20px rgba(34,197,94,.1)}
+/* 使用說明全屏頁 */
+.guide-screen{position:fixed;inset:0;background:linear-gradient(180deg,#0a0805,#1a150d);z-index:9500;display:none;flex-direction:column;overflow-y:auto;padding:20px}
+.guide-screen.active{display:flex}
+.guide-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.guide-header h2{font-size:20px;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
+.guide-content{flex:1;font-size:20px;line-height:2.2;padding:10px 0;font-weight:500}
+.guide-line{color:rgba(255,255,255,.5);padding:8px 12px;border-radius:8px;margin-bottom:8px;transition:all .4s;border-left:4px solid transparent}
+.guide-line.active{color:#f5d76e;background:rgba(212,175,55,.12);border-left-color:#f5d76e;font-weight:700;text-shadow:0 0 12px rgba(245,215,110,.5);transform:translateX(8px)}
+.guide-line.done{color:rgba(245,240,225,.85);border-left-color:rgba(212,175,55,.3)}
+.guide-footer{padding-top:16px;border-top:1px solid var(--line);display:flex;gap:10px}
+.guide-footer .btn{flex:1}
 </style>
 </head>
 <body>
@@ -104,7 +121,7 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
 <div class="header">
   <h1>🧍 乘客專用端 · 浚鍵管理</h1>
   <div>
-    <button onclick="speakPage()">🔊</button>
+    <button onclick="openGuide()">📖 說明</button>
     <a href="index.html">← 首頁</a>
   </div>
 </div>
@@ -114,26 +131,26 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
   <!-- 登入 -->
   <div id="login-view" class="card">
     <div class="card-title">🔐 登入</div>
-    <label>電話號碼 / 管理員電郵</label>
+    <button class="btn btn-primary" onclick="googleLogin()">🅶 Google 帳號登入</button>
+    <div style="text-align:center;color:var(--txt2);font-size:13px;margin:12px 0">— 或 —</div>
+    <label>電話號碼（乘客） / 電郵（管理員）</label>
     <input type="text" id="p-phone" placeholder="91234567 或 admin@gmail.com">
     <label>您的姓名（乘客填寫）</label>
     <input type="text" id="p-name" placeholder="例如：陳先生" maxlength="20">
     <button class="btn btn-gold" onclick="doLogin()">立即登入</button>
-    <div id="login-err" style="color:var(--red);font-size:13px;text-align:center;margin-top:8px"></div>
-    <div style="font-size:12px;color:var(--txt2);margin-top:12px;line-height:1.6">💡 管理員可使用電郵登入以查看後台。</div>
+    <div id="login-err" style="color:var(--red);font-size:14px;text-align:center;margin-top:8px"></div>
   </div>
 
   <!-- 主介面 -->
   <div id="main-view" style="display:none">
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px">
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:14px">
       <div>
-        <div id="p-welcome" style="font-size:15px;font-weight:700;color:var(--gold-b)">👤</div>
-        <div id="p-phone-disp" style="font-size:12px;color:var(--txt2)"></div>
+        <div id="p-welcome" style="font-size:16px;font-weight:700;color:var(--gold-b)">👤</div>
+        <div id="p-phone-disp" style="font-size:13px;color:var(--txt2)"></div>
       </div>
       <button class="btn btn-outline btn-sm" onclick="doLogout()">登出</button>
     </div>
 
-    <!-- 管理員入口 -->
     <button class="btn btn-warn" id="admin-entry-btn" style="display:none;margin-bottom:10px"
             onclick="openAdminModal()">👑 進入後台</button>
 
@@ -144,7 +161,7 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
       <button class="tab-btn" id="tab-msg" onclick="switchTab('msg')">💬 訊息</button>
     </div>
 
-    <!-- 留位（獨立頁） -->
+    <!-- 留位 -->
     <div id="panel-booking">
       <div class="card">
         <div class="card-title">🌅 早上固定班次</div>
@@ -154,8 +171,8 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
         <div class="card-title">🌆 傍晚固定班次</div>
         <div id="shift-evening"></div>
       </div>
-      <div class="card" id="loop-card" style="display:none">
-        <div class="card-title">🔄 循環線留位（07:00 - 18:00）</div>
+      <div class="card" id="loop-card" style="display:none;border:2px solid rgba(56,189,248,.4);box-shadow:0 0 30px rgba(56,189,248,.15)">
+        <div class="card-title" style="color:#7dd3fc;border-color:rgba(56,189,248,.3)">🔄 循環線留位（07:00 - 18:00）</div>
         <div id="loop-content"></div>
       </div>
     </div>
@@ -168,7 +185,7 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
       </div>
     </div>
 
-    <!-- 追蹤小巴 -->
+    <!-- 追蹤 -->
     <div id="panel-track" style="display:none">
       <div class="card" id="bus-list-card">
         <div class="card-title">🚐 選擇要追蹤嘅小巴</div>
@@ -181,7 +198,7 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
             <div class="track-station" id="tr-station">--</div>
             <div class="track-next" id="tr-next">下一站：--</div>
             <div class="track-count" id="tr-count">0</div>
-            <div style="font-size:11px;color:var(--txt2)">目前乘客 / <span id="tr-seats">16</span> 座</div>
+            <div style="font-size:12px;color:var(--txt2)">目前乘客 / <span id="tr-seats">16</span> 座</div>
           </div>
           <div class="route-strip" id="tr-route-strip"></div>
           <button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" onclick="stopTrack()">← 返回小巴列表</button>
@@ -197,7 +214,7 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
         <select id="msg-bus"><option value="">-- 請選擇 --</option></select>
         <div class="row" style="margin:0">
           <input id="msg-input" placeholder="輸入訊息…" style="margin:0">
-          <button class="btn btn-gold" onclick="sendMsg()" style="width:auto;flex:0 0 auto;padding:12px 18px;margin:0">發送</button>
+          <button class="btn btn-gold" onclick="sendMsg()" style="width:auto;flex:0 0 auto;padding:16px 22px;margin:0;font-size:16px">發送</button>
         </div>
         <button class="btn btn-warn" id="btn-record" style="margin-top:8px">🎤 錄製語音訊息</button>
         <div id="record-controls" class="rec-controls">
@@ -208,7 +225,7 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
       </div>
       <div class="card">
         <div class="card-title">📨 訊息記錄</div>
-        <div id="msg-history" style="max-height:220px;overflow-y:auto"></div>
+        <div id="msg-history" style="max-height:280px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
@@ -235,6 +252,19 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weig
     <div class="admin-list" id="pa-bus-list" style="margin-bottom:10px;max-height:140px"></div>
     <div class="admin-list" id="pa-stats" style="margin-bottom:10px;max-height:120px"></div>
     <button class="btn btn-gold" onclick="closeAdminModal()">關閉</button>
+  </div>
+</div>
+
+<!-- 使用說明全屏頁 -->
+<div class="guide-screen" id="guide-screen">
+  <div class="guide-header">
+    <h2>📖 乘客使用說明</h2>
+    <button class="btn btn-outline btn-sm" onclick="closeGuide()">✕ 關閉</button>
+  </div>
+  <div class="guide-content" id="guide-content"></div>
+  <div class="guide-footer">
+    <button class="btn btn-gold" id="guide-play-btn" onclick="toggleGuidePlay()">▶️ 開始播放</button>
+    <button class="btn btn-secondary" onclick="closeGuide()">關閉</button>
   </div>
 </div>
 
@@ -278,6 +308,7 @@ let busListRef=null, myBookingRef=null, shiftClaimRef=null, trackBusRef=null, ms
 let claimsCache={};
 let myBookingsCache={};
 let loopCache={};
+let messagesCache={};
 let knownBookingStatus={};
 let firstBookingLoad=true;
 let trackingPlate=null;
@@ -302,35 +333,102 @@ function playAudio(b64){
   try{const a=new Audio('data:audio/webm;base64,'+b64);a.volume=1;a.play().catch(()=>{});}catch(e){}
 }
 
-/* 聲音 */
 function beep(hi=false){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=hi?1320:880;g.gain.value=.35;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.2);}catch(e){}}
 function playAlert(){beep(false);setTimeout(()=>beep(true),260);setTimeout(()=>beep(false),520);}
 function vibrate(ms){try{if(navigator.vibrate)navigator.vibrate(ms||100);}catch(e){}}
 
-/* 粵語 */
 let speakQueue=[],speakBusy=false;
-function speak(text){
-  if(!window.speechSynthesis||!text)return;
+function speak(text,onEnd){
+  if(!window.speechSynthesis||!text){if(onEnd)setTimeout(onEnd,200);return;}
   if(speakQueue.length>3)speakQueue.shift();
-  speakQueue.push(text);processSpeak();
+  speakQueue.push({text,onEnd});processSpeak();
 }
 function processSpeak(){
   if(speakBusy||!speakQueue.length)return;
   speakBusy=true;
-  const text=speakQueue.shift();
-  const u=new SpeechSynthesisUtterance(text);
+  const item=speakQueue.shift();
+  const u=new SpeechSynthesisUtterance(item.text);
   u.lang='zh-HK';u.rate=.9;u.volume=1;
   const voices=window.speechSynthesis.getVoices();
   const v=voices.find(x=>x.lang==='zh-HK')||voices.find(x=>x.lang.startsWith('zh'));
   if(v)u.voice=v;
-  u.onend=u.onerror=()=>{speakBusy=false;setTimeout(processSpeak,80);};
+  const done=()=>{speakBusy=false;if(item.onEnd)item.onEnd();setTimeout(processSpeak,80);};
+  u.onend=done;
+  u.onerror=done;
   window.speechSynthesis.speak(u);
 }
-function speakPage(){
-  speak('歡迎使用浚鍵管理有限公司乘客專用端。呢度可以留位、查看你嘅預約、追蹤小巴位置、同埋向司機發送訊息。');
+
+/* 使用說明 */
+const PASSENGER_GUIDE = [
+  "歡迎使用浚鍵管理有限公司乘客專用端。",
+  "首先，你可以用 Google 帳號登入，或者輸入你嘅電話號碼同姓名登入。",
+  "登入後，你可以喺「留位」分頁睇到今日所有班次。",
+  "撳你想要嘅班次時間，例如早上六點二十分，就會進入留位表單。",
+  "填寫姓名、人數、上車地點，然後撳「送出留位申請」。",
+  "當司機確認你嘅留位之後，系統會彈出通知同發出聲音，話你知留位成功，同時顯示負責車牌。",
+  "你可以喺「我的預約」分頁睇到自己所有預約，包括車牌同狀態。",
+  "上車之後，記得撳「我已上車」按鈕，通知司機。",
+  "如果你要追蹤小巴位置，可以到「追蹤」分頁，選擇車牌後會顯示即時路線圖。",
+  "如有需要，你可以喺「訊息」分頁向司機發送文字或語音訊息。",
+  "多謝使用浚鍵管理有限公司乘客專用端，祝你旅途愉快。"
+];
+
+let guidePlaying = false;
+let guideIdx = 0;
+let guideTimer = null;
+
+function openGuide(){
+  $('guide-screen').classList.add('active');
+  renderGuide();
+  guideIdx = 0;
+  guidePlaying = false;
+  $('guide-play-btn').textContent = '▶️ 開始播放';
+}
+function closeGuide(){
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
+  guidePlaying=false;
+  if(guideTimer){clearTimeout(guideTimer);guideTimer=null;}
+  $('guide-screen').classList.remove('active');
+}
+function renderGuide(){
+  const c=$('guide-content');
+  c.innerHTML = PASSENGER_GUIDE.map((line,i)=>`<div class="guide-line" id="gl-${i}">${esc(line)}</div>`).join('');
+}
+function toggleGuidePlay(){
+  if(guidePlaying){
+    guidePlaying=false;
+    if(window.speechSynthesis)window.speechSynthesis.cancel();
+    if(guideTimer){clearTimeout(guideTimer);guideTimer=null;}
+    $('guide-play-btn').textContent='▶️ 繼續播放';
+    return;
+  }
+  guidePlaying=true;
+  $('guide-play-btn').textContent='⏸️ 暫停';
+  playNextGuideLine();
+}
+function playNextGuideLine(){
+  if(!guidePlaying)return;
+  if(guideIdx >= PASSENGER_GUIDE.length){
+    guidePlaying=false;
+    $('guide-play-btn').textContent='🔄 重新播放';
+    guideIdx = 0;
+    return;
+  }
+  document.querySelectorAll('.guide-line').forEach(el=>el.classList.remove('active'));
+  const el = document.getElementById('gl-'+guideIdx);
+  if(el){
+    el.classList.add('active');
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  speak(PASSENGER_GUIDE[guideIdx], ()=>{
+    if(!guidePlaying)return;
+    const cur = document.getElementById('gl-'+guideIdx);
+    if(cur)cur.classList.add('done');
+    guideIdx++;
+    guideTimer = setTimeout(playNextGuideLine, 500);
+  });
 }
 
-/* 通知彈窗 */
 let notifQueue=[],notifShowing=false;
 function showNotif(title,bodyHTML,speakText){
   notifQueue.push({title,bodyHTML,speakText});processNotifQueue();
@@ -347,7 +445,6 @@ function processNotifQueue(){
 }
 function closeNotif(){$('notif-modal').classList.remove('active');notifShowing=false;setTimeout(processNotifQueue,400);}
 
-/* 錄音 */
 const RecorderManager={
   instances:{},
   create(id,onSend){
@@ -395,16 +492,13 @@ const RecorderManager={
   get(id){return this.instances[id];}
 };
 
-/* ===== 角色判斷（查 admins 節點，冇硬編碼） ===== */
 async function checkUserRole(input){
   if(!input)return{role:'passenger',super:false};
   if(!input.includes('@'))return{role:'passenger',super:false};
   const e=input.toLowerCase();
   try{
     let snap=await db.ref('admins').orderByChild('email').equalTo(e).once('value');
-    if(!snap.exists()){
-      snap=await db.ref('admins').orderByChild('identifier').equalTo(e).once('value');
-    }
+    if(!snap.exists())snap=await db.ref('admins').orderByChild('identifier').equalTo(e).once('value');
     if(snap.exists()){
       let isSuper=false;
       snap.forEach(c=>{if(c.val().super===true)isSuper=true;});
@@ -414,7 +508,39 @@ async function checkUserRole(input){
   return{role:'passenger',super:false};
 }
 
-/* ===== 登入 ===== */
+/* Google 登入 */
+async function googleLogin(){
+  try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    const result=await auth.signInWithPopup(provider);
+    const user=result.user;
+    const email=user.email;
+    const {role,super:isSuper}=await checkUserRole(email);
+
+    if(role==='admin'){
+      currentPassenger={uid:user.uid,phone:email,name:email.split('@')[0],role,super:isSuper};
+      isAdmin=true;isSuperAdmin=isSuper;
+    }else{
+      currentPassenger={uid:user.uid,phone:email,name:user.displayName||email.split('@')[0],role:'passenger',super:false};
+      isAdmin=false;isSuperAdmin=false;
+    }
+    localStorage.setItem('pax_session',JSON.stringify(currentPassenger));
+    await db.ref('booking_passengers/'+email).update({
+      name:currentPassenger.name,phone:email,role,super:isSuper,lastLogin:now()
+    });
+    initUI();
+    if(isAdmin){
+      $('admin-entry-btn').style.display='block';
+      $('admin-entry-btn').textContent=isSuperAdmin?'👑 進入超管後台':'👑 進入總管後台';
+    }
+    toast('✅ Google 登入成功：'+email+(isSuperAdmin?'（超管）':isAdmin?'（管理員）':''));
+    speak(isSuperAdmin?'超級管理員登入成功':isAdmin?'管理員登入成功':'歡迎 '+currentPassenger.name);
+  }catch(e){
+    if(e.code==='auth/popup-closed-by-user')toast('登入視窗已關閉');
+    else toast('❌ 登入失敗：'+e.message);
+  }
+}
+
 async function doLogin(){
   const input=$('p-phone').value.trim();
   const name=$('p-name').value.trim();
@@ -442,17 +568,15 @@ async function doLogin(){
     isAdmin=(role==='admin');
     isSuperAdmin=isSuper;
     localStorage.setItem('pax_session',JSON.stringify(currentPassenger));
-
     await db.ref('booking_passengers/'+input).update({
       name:finalName,phone:input,role,super:isSuper,lastLogin:now()
     });
-
     initUI();
     if(isAdmin){
       $('admin-entry-btn').style.display='block';
       $('admin-entry-btn').textContent=isSuperAdmin?'👑 進入超管後台':'👑 進入總管後台';
     }
-    toast('✅ 登入成功：'+finalName+(isSuperAdmin?'（超級管理員）':isAdmin?'（管理員）':''));
+    toast('✅ 登入成功：'+finalName+(isSuperAdmin?'（超管）':isAdmin?'（管理員）':''));
     speak(isSuperAdmin?'超級管理員登入成功':isAdmin?'管理員登入成功':'歡迎 '+finalName);
   }catch(e){$('login-err').textContent='登入失敗：'+e.message;}
 }
@@ -479,7 +603,6 @@ function initUI(){
   setupRecorder();
 }
 
-/* Tab */
 function switchTab(tab){
   activeTab=tab;
   ['booking','mine','track','msg'].forEach(k=>{
@@ -493,7 +616,6 @@ function switchTab(tab){
   if(tab==='msg')loadBusList();
 }
 
-/* 班次認領 */
 function loadShiftClaims(){
   if(shiftClaimRef){try{shiftClaimRef.off();}catch(e){}}
   shiftClaimRef=db.ref('booking_seats/'+getToday());
@@ -521,7 +643,7 @@ function renderShiftCard(tm){
     </div>
     <div style="text-align:right">
       <div class="num">${rem}</div>
-      <div style="font-size:10px;color:var(--txt2)">剩餘</div>
+      <div style="font-size:11px;color:var(--txt2)">剩餘</div>
     </div>
   </div>`;
 }
@@ -538,23 +660,39 @@ function renderLoop(){
   const mine=Object.entries(loopCache).find(([k,x])=>x.phone===currentPassenger.phone&&(x.status==='pending'||x.status==='reserved'));
   if(mine){
     const [id,x]=mine;
-    const status=x.status==='pending'?'⏳ 等待司機確認':'✅ 已確認留位';
-    const color=x.status==='pending'?'var(--yellow)':'var(--green)';
-    $('loop-content').innerHTML=`
-      <div style="background:#0a0805;border-radius:10px;padding:14px;border-left:3px solid ${color}">
-        <div style="font-size:15px;font-weight:700;color:${color}">${status}</div>
-        ${x.pickupLocation?`<div style="font-size:12px;color:var(--txt2);margin-top:6px">📍 ${esc(x.pickupLocation)}</div>`:''}
-        ${x.confirmedBy?`<div style="font-size:13px;color:var(--gold-b);font-weight:700;margin-top:6px">🚐 負責車牌：${esc(x.confirmedBy)}</div>`:''}
-        ${x.status==='reserved'?`<button class="btn btn-success" style="margin-top:10px" onclick="loopBoarded('${id}')">🚐 我已上車</button>`:''}
-        <button class="btn btn-outline" style="margin-top:8px" onclick="loopCancel('${id}')">取消留位</button>
-      </div>`;
-    return;
+    if(x.status==='pending'){
+      $('loop-content').innerHTML=`
+        <div class="loop-pending">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:18px;font-weight:800;color:#fcd34d">⏳ 等待司機確認</div>
+            <span class="badge badge-yellow">候補中</span>
+          </div>
+          ${x.pickupLocation?`<div style="font-size:14px;color:var(--txt2);margin-top:8px">📍 ${esc(x.pickupLocation)}</div>`:''}
+          <div style="font-size:13px;color:var(--txt2);margin-top:6px">⏰ ${x.createdAt?new Date(x.createdAt).toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit'}):''}</div>
+          <button class="btn btn-danger" style="margin-top:12px" onclick="loopCancel('${id}')">取消留位</button>
+        </div>`;
+      return;
+    }
+    if(x.status==='reserved'){
+      $('loop-content').innerHTML=`
+        <div class="loop-reserved">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:18px;font-weight:800;color:#86efac">✅ 已確認留位</div>
+            <span class="badge badge-green">已確認</span>
+          </div>
+          ${x.pickupLocation?`<div style="font-size:14px;color:var(--txt2);margin-top:8px">📍 ${esc(x.pickupLocation)}</div>`:''}
+          ${x.confirmedBy?`<div style="font-size:15px;color:var(--gold-b);font-weight:700;margin-top:8px">🚐 負責車牌：${esc(x.confirmedBy)}</div>`:''}
+          <button class="btn btn-success" style="margin-top:12px" onclick="loopBoarded('${id}')">🚐 我已上車</button>
+          <button class="btn btn-outline" style="margin-top:8px" onclick="loopCancel('${id}')">取消留位</button>
+        </div>`;
+      return;
+    }
   }
   $('loop-content').innerHTML=`
+    <div style="font-size:14px;color:var(--txt2);line-height:1.7;margin-bottom:12px">🔄 循環線時段 07:00 - 18:00，即時留位，司機確認後顯示車牌。</div>
     <label>📍 上車地點</label>
     <input type="text" id="loop-pickup" placeholder="例如：大棠村迴旋處" maxlength="40">
-    <button class="btn btn-gold" onclick="loopJoin()">🔄 循環線留位</button>
-    <div style="font-size:11px;color:var(--txt2);margin-top:6px">循環線為即時留位，司機確認後會顯示車牌。</div>`;
+    <button class="btn btn-gold" onclick="loopJoin()">🔄 循環線留位</button>`;
 }
 async function loopJoin(){
   const pickup=$('loop-pickup').value.trim();
@@ -577,6 +715,7 @@ async function loopBoarded(id){
   if(!confirm('確定你已上車？'))return;
   await db.ref('booking_loop/'+getToday()+'/'+id).update({status:'boarded',boardedAt:now()});
   toast('✅ 已記錄上車');
+  speak('已記錄上車');
 }
 
 /* 留位表單 */
@@ -588,8 +727,8 @@ function openBooking(tm){
     </div>
     <div class="card">
       <div class="card-title">🎫 ${tm} 班次留位</div>
-      <div style="font-size:13px;color:var(--txt2);margin-bottom:8px">${getOrigL(tm)}</div>
-      <div style="font-size:14px;color:${plate?'var(--green)':'var(--txt2)'};font-weight:700;margin-bottom:12px">
+      <div style="font-size:14px;color:var(--txt2);margin-bottom:10px">${getOrigL(tm)}</div>
+      <div style="font-size:16px;color:${plate?'var(--green)':'var(--txt2)'};font-weight:700;margin-bottom:14px">
         ${plate?'🚐 負責車牌：'+esc(plate):'⏳ 車輛待司機認領'}
       </div>
       <label>姓名</label>
@@ -619,6 +758,7 @@ async function submitBooking(tm){
       seats,pickupLocation:pickup,status:'pending',createdAt:now()
     });
     toast('✅ 留位申請已送出，等待司機確認');
+    speak('留位申請已送出，等待司機確認');
     setTimeout(()=>switchTab('mine'),700);
   }catch(e){toast('❌ '+e.message);}
 }
@@ -639,8 +779,8 @@ function loadMyBookings(){
         const prev=knownBookingStatus[b.id];
         if(prev==='pending'&&b.status==='reserved'){
           showNotif('✅ 留位已確認！',
-            `<div><b>${b.time} 班次</b><br>`+
-            (b.confirmedBy?`🚐 負責車牌：<b style="color:var(--gold-b)">${esc(b.confirmedBy)}</b><br>`:'')+
+            `<div><b style="font-size:18px;color:#f5d76e">${b.time} 班次</b><br>`+
+            (b.confirmedBy?`🚐 負責車牌：<b style="color:#f5d76e;font-size:16px">${esc(b.confirmedBy)}</b><br>`:'')+
             `📍 ${esc(b.pickupLocation||'')}</div>`,
             '留位已確認，'+b.time+' 班次'+(b.confirmedBy?'，車牌 '+b.confirmedBy:''));
         }
@@ -657,7 +797,7 @@ function loadMyBookings(){
 function renderMyBookings(list){
   const c=$('my-bookings');
   if(!list.length){
-    c.innerHTML='<div style="text-align:center;color:var(--txt2);padding:20px;font-size:13px">你今日暫無預約記錄<br>請到「留位」分頁選擇班次</div>';
+    c.innerHTML='<div style="text-align:center;color:var(--txt2);padding:20px;font-size:14px">你今日暫無預約記錄<br>請到「留位」分頁選擇班次</div>';
     return;
   }
   list.sort((a,b)=>a.time.localeCompare(b.time));
@@ -669,14 +809,14 @@ function renderMyBookings(list){
       :'<span class="badge">'+b.status+'</span>';
     h+='<div class="my-booking '+b.status+'">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center">';
-    h+='<div style="font-size:15px;font-weight:700;color:var(--txt)">'+b.time+' 班次 ('+(b.seats||1)+'位)</div>';
+    h+='<div style="font-size:17px;font-weight:700;color:var(--txt)">'+b.time+' 班次 ('+(b.seats||1)+'位)</div>';
     h+='<div>'+badge+'</div></div>';
-    h+='<div style="font-size:12px;color:var(--txt2);margin-top:4px">'+getOrigL(b.time)+'</div>';
-    if(b.pickupLocation)h+='<div style="font-size:12px;color:var(--green);margin-top:2px">📍 '+esc(b.pickupLocation)+'</div>';
-    if(b.confirmedBy)h+='<div style="font-size:13px;color:var(--gold-b);font-weight:700;margin-top:4px">🚐 負責車牌：'+esc(b.confirmedBy)+'</div>';
-    h+='<div style="display:flex;gap:6px;margin-top:8px">';
-    if(b.status==='reserved')h+='<button class="btn btn-success btn-sm" style="flex:1;margin:0" onclick="paxBoarded(\''+b.id+'\',\''+b.date+'\')">🚐 我已上車</button>';
-    h+='<button class="btn btn-outline btn-sm" style="flex:1;margin:0" onclick="paxCancel(\''+b.id+'\',\''+b.date+'\')">取消預約</button>';
+    h+='<div style="font-size:13px;color:var(--txt2);margin-top:4px">'+getOrigL(b.time)+'</div>';
+    if(b.pickupLocation)h+='<div style="font-size:14px;color:var(--green);margin-top:4px">📍 '+esc(b.pickupLocation)+'</div>';
+    if(b.confirmedBy)h+='<div style="font-size:15px;color:var(--gold-b);font-weight:700;margin-top:6px">🚐 負責車牌：'+esc(b.confirmedBy)+'</div>';
+    h+='<div style="display:flex;gap:8px;margin-top:10px">';
+    if(b.status==='reserved')h+='<button class="btn btn-success" style="flex:1;margin:0;padding:14px;font-size:16px" onclick="paxBoarded(\''+b.id+'\',\''+b.date+'\')">🚐 我已上車</button>';
+    h+='<button class="btn btn-outline" style="flex:1;margin:0;padding:14px;font-size:16px" onclick="paxCancel(\''+b.id+'\',\''+b.date+'\')">取消預約</button>';
     h+='</div></div>';
   });
   c.innerHTML=h;
@@ -692,7 +832,7 @@ async function paxCancel(id,date){
   catch(e){toast('❌ '+e.message);}
 }
 
-/* 追蹤小巴 */
+/* 追蹤 */
 function loadBusList(){
   if(busListRef){try{busListRef.off();}catch(e){}}
   busListRef=db.ref('van/active_buses');
@@ -705,16 +845,16 @@ function loadBusList(){
     const list=$('bus-list');
     const sel=$('msg-bus');
     if(!buses.length){
-      list.innerHTML='<div style="text-align:center;color:var(--txt2);padding:16px;font-size:13px">目前沒有在線小巴</div>';
+      list.innerHTML='<div style="text-align:center;color:var(--txt2);padding:16px;font-size:14px">目前沒有在線小巴</div>';
     }else{
       list.innerHTML=buses.map(b=>`
         <div class="bus-card">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div style="font-size:18px;font-weight:800;color:var(--gold-b)">🚐 ${esc(b.plate)}</div>
-            <div style="font-size:20px;font-weight:900;color:${b.isFull?'var(--red)':'var(--green)'}">${b.isFull?'滿座':(b.passengerCount||0)+'人'}</div>
+            <div style="font-size:20px;font-weight:800;color:var(--gold-b)">🚐 ${esc(b.plate)}</div>
+            <div style="font-size:22px;font-weight:900;color:${b.isFull?'var(--red)':'var(--green)'}">${b.isFull?'滿座':(b.passengerCount||0)+'人'}</div>
           </div>
-          <div style="font-size:13px;color:var(--txt2);margin-top:6px">📍 目前：${esc(b.currentStation||'未知')}</div>
-          <div style="font-size:12px;color:var(--gold-b);margin-top:2px">➡️ 下一站：${esc(b.nextStation||'終點')}</div>
+          <div style="font-size:14px;color:var(--txt2);margin-top:6px">📍 目前：${esc(b.currentStation||'未知')}</div>
+          <div style="font-size:13px;color:var(--gold-b);margin-top:2px">➡️ 下一站：${esc(b.nextStation||'終點')}</div>
           <button class="btn btn-gold" style="margin-top:10px" onclick="startTrack('${esc(b.plate)}')">📍 即時追蹤路線</button>
         </div>`).join('');
     }
@@ -768,7 +908,7 @@ function renderRouteStrip(routeArr,currentIdx){
   },120);
 }
 
-/* 訊息 */
+/* 訊息 + 刪除 */
 async function sendMsg(){
   const bus=$('msg-bus').value;
   const text=$('msg-input').value.trim();
@@ -782,6 +922,14 @@ async function sendMsg(){
   $('msg-input').value='';
   toast('✅ 已發送');
 }
+function canDeleteMsg(m){
+  if(!m)return false;
+  // 管理員 / 超管可刪任何訊息
+  if(isAdmin)return true;
+  // 乘客只可以刪除自己發嘅
+  if(m.senderUid===currentPassenger.uid)return true;
+  return false;
+}
 function loadMsgHistory(){
   if(msgRef){try{msgRef.off();}catch(e){}}
   msgRef=db.ref('van/messages').orderByChild('timestamp').limitToLast(40);
@@ -789,23 +937,38 @@ function loadMsgHistory(){
     const c=$('msg-history');
     if(!c)return;
     const items=[];
+    messagesCache={};
     snap.forEach(ch=>{
       const m=ch.val();
       if(m.hidden)return;
-      if(m.senderUid===currentPassenger.uid||m.busId==='broadcast')items.push(m);
+      messagesCache[ch.key]=m;
+      if(m.senderUid===currentPassenger.uid||m.busId==='broadcast')items.push({key:ch.key,msg:m});
     });
-    items.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
-    if(!items.length){c.innerHTML='<div style="color:var(--txt2);font-size:12px;padding:8px;text-align:center">暫無訊息</div>';return;}
-    c.innerHTML=items.slice(0,20).map(m=>{
+    items.sort((a,b)=>(b.msg.timestamp||0)-(a.msg.timestamp||0));
+    if(!items.length){c.innerHTML='<div style="color:var(--txt2);font-size:13px;padding:8px;text-align:center">暫無訊息</div>';return;}
+    c.innerHTML=items.slice(0,20).map(it=>{
+      const m=it.msg;
       const isMe=m.senderUid===currentPassenger.uid;
       const time=m.timestamp?new Date(m.timestamp).toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit'}):'';
-      return `<div class="msg-row">
-        <span style="color:var(--txt2);font-size:11px">${time}</span>
-        <span style="color:${isMe?'var(--gold-b)':'var(--green)'};font-weight:700">${isMe?'我':esc(m.senderIdentifier||'?')}</span>
-        ${m.audio?`<button class="play-audio" onclick="playAudio('${m.audio}')">▶ 語音</button>`:`<span>${esc(m.text||'')}</span>`}
-      </div>`;
+      let h='<div class="msg-row">';
+      h+=`<span style="color:var(--txt2);font-size:12px">${time}</span>`;
+      h+=`<span style="color:${isMe?'var(--gold-b)':'var(--green)'};font-weight:700">${isMe?'我':esc(m.senderIdentifier||'?')}</span>`;
+      if(m.audio)h+=`<button class="play-audio" onclick="playAudio('${m.audio}')">▶ 語音</button>`;
+      else h+=`<span style="flex:1">${esc(m.text||'')}</span>`;
+      if(canDeleteMsg(m))h+=`<button class="del-btn" onclick="deleteMsg('${it.key}')">🗑️</button>`;
+      h+='</div>';
+      return h;
     }).join('');
   });
+}
+async function deleteMsg(key){
+  if(!confirm('確定刪除呢條訊息？'))return;
+  try{
+    const m=messagesCache[key];
+    if(!canDeleteMsg(m)){toast('❌ 冇權限刪除此訊息');return;}
+    await db.ref('van/messages/'+key).remove();
+    toast('✅ 已刪除');
+  }catch(e){toast('❌ '+e.message);}
 }
 
 /* 錄音 */
@@ -832,7 +995,7 @@ function setupRecorder(){
 function stopRecord(){const rec=RecorderManager.get('');if(rec&&rec.isRecording())rec.stop();$('record-controls').style.display='none';$('btn-record').style.display='block';}
 function cancelRecord(){const rec=RecorderManager.get('');if(rec&&rec.isRecording())rec.cancel();$('record-controls').style.display='none';$('btn-record').style.display='block';}
 
-/* ===== 管理員後台 Modal ===== */
+/* 管理員後台 */
 function openAdminModal(){
   if(!isAdmin)return toast('❌ 權限不足');
   $('admin-modal').classList.add('active');
@@ -872,7 +1035,6 @@ async function loadPaxAdminPanel(){
     '<div class="item">🚐 已上車：<b>'+boarded+'</b></div>';
 }
 
-/* 啟動 */
 window.addEventListener('load',()=>{
   const saved=localStorage.getItem('pax_session');
   if(saved){
@@ -889,11 +1051,13 @@ window.addEventListener('load',()=>{
 });
 
 Object.assign(window,{
-  doLogin,doLogout,switchTab,openBooking,submitBooking,
+  doLogin,doLogout,googleLogin,switchTab,openBooking,submitBooking,
   paxBoarded,paxCancel,sendMsg,stopRecord,cancelRecord,
-  playAudio,speakPage,closeNotif,startTrack,stopTrack,
+  playAudio,closeNotif,startTrack,stopTrack,
   loopJoin,loopCancel,loopBoarded,
-  openAdminModal,closeAdminModal
+  openAdminModal,closeAdminModal,
+  openGuide,closeGuide,toggleGuidePlay,
+  deleteMsg
 });
 </script>
 </body>
