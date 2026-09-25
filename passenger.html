@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>浚鍵管理有限公司 · 乘客專用端</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#0a0805;--card:#1a150d;--card2:#252017;--line:rgba(212,175,55,.18);--gold:#d4af37;--gold-b:#f5d76e;--txt:#f5f0e1;--txt2:#a89b7a;--green:#22c55e;--red:#ef4444;--yellow:#fbbf24}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#0a0805,#14100a);color:var(--txt);min-height:100vh;padding-bottom:20px}
+.header{position:sticky;top:0;background:linear-gradient(135deg,#1a150d,#0a0805);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.header h1{font-size:15px;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;letter-spacing:.5px}
+.header a,.header button{color:var(--gold);text-decoration:none;font-size:12px;background:transparent;border:1px solid var(--line);padding:6px 10px;border-radius:8px;cursor:pointer;font-family:inherit;margin-left:4px}
+.container{padding:14px;max-width:640px;margin:0 auto}
+.card{background:linear-gradient(145deg,var(--card),var(--card2));border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--line);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.card-title{font-size:14px;font-weight:700;color:var(--gold-b);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:8px;transition:all .15s;text-align:center;font-family:inherit}
+.btn:active{transform:scale(.98);opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-gold{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;box-shadow:0 4px 14px rgba(212,175,55,.35)}
+.btn-primary{background:linear-gradient(135deg,#2a2418,#1a150d);border:1px solid var(--gold);color:var(--gold-b)}
+.btn-success{background:linear-gradient(135deg,#16a34a,#15803d)}
+.btn-danger{background:linear-gradient(135deg,#dc2626,#991b1b)}
+.btn-warn{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a150d}
+.btn-secondary{background:#1e1a12;color:var(--txt2);border:1px solid var(--line)}
+.btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold-b)}
+.btn-sm{padding:7px 12px;font-size:12px;width:auto;display:inline-block;margin:0 3px 0 0}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0a0805;color:var(--txt);font-size:15px;margin-bottom:10px;outline:none;font-family:inherit}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.15)}
+label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px;font-weight:600}
+.row{display:flex;gap:8px;margin-bottom:8px}.row>*{flex:1}
+.tab-bar{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+.tab-btn{flex:1;min-width:80px;padding:10px 6px;background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;white-space:nowrap}
+.tab-btn.active{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;border-color:transparent;box-shadow:0 4px 14px rgba(212,175,55,.35)}
+.pax-card{background:#0a0805;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid var(--line);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s}
+.pax-card:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(212,175,55,.15)}
+.pax-card .time{font-size:20px;font-weight:900;color:var(--gold-b);letter-spacing:1px}
+.pax-card .info{font-size:11px;color:var(--txt2);margin-top:2px}
+.pax-card .plate{font-size:12px;color:var(--green);font-weight:700;margin-top:4px}
+.pax-card .plate.wait{color:var(--txt2)}
+.pax-card .num{font-size:22px;font-weight:800;color:var(--gold-b)}
+.pax-card.full{opacity:.55}
+.pax-card.full .num{color:var(--red)}
+.my-booking{background:#0a0805;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid var(--gold)}
+.my-booking.reserved{border-left-color:var(--green)}
+.my-booking.boarded{border-left-color:#0ea5e9}
+.my-booking.pending{border-left-color:var(--yellow)}
+.my-booking.rejected{border-left-color:var(--red)}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-weight:700;font-size:11px;margin:2px;border:1px solid}
+.badge-gold{background:rgba(212,175,55,.15);color:var(--gold-b);border-color:rgba(212,175,55,.4)}
+.badge-green{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.4)}
+.badge-yellow{background:rgba(251,191,36,.15);color:#fcd34d;border-color:rgba(251,191,36,.4)}
+.badge-blue{background:rgba(56,189,248,.15);color:#7dd3fc;border-color:rgba(56,189,248,.4)}
+.badge-red{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.4)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a150d,#0a0805);color:var(--gold-b);padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s;border:1px solid var(--gold);pointer-events:none;max-width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.toast.show{opacity:1}
+.rec-controls{display:none;gap:6px;margin-top:8px}
+.rec-controls button{flex:1;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit}
+.rec-stop{background:linear-gradient(135deg,#16a34a,#15803d)}
+.rec-cancel{background:linear-gradient(135deg,#dc2626,#991b1b)}
+.rec-status{display:none;align-items:center;gap:8px;padding:8px;background:#0a0805;border-radius:8px;margin-top:8px;font-size:13px;color:var(--gold-b);border:1px solid var(--line)}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse .6s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.bus-card{background:#0a0805;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid var(--line)}
+.play-audio{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#1a150d;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700}
+.msg-row{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.route-strip{display:flex;overflow-x:auto;gap:12px;padding:14px 8px;background:rgba(0,0,0,.4);border-radius:12px;border:1px solid var(--line);min-height:80px;align-items:center;scroll-behavior:smooth}
+.dot-node{flex:0 0 130px;text-align:center;font-size:12px;white-space:nowrap;padding:4px 0}
+.dot-node .dot{width:22px;height:22px;border-radius:50%;background:#2a2418;margin:0 auto 6px;border:2px solid #4a4232;transition:all .3s}
+.dot-node .nm{color:var(--txt2)}
+.dot-node.current .dot{background:var(--green);border-color:#f5d76e;box-shadow:0 0 18px var(--green),0 0 30px rgba(34,197,94,.5);transform:scale(1.2)}
+.dot-node.current .nm{color:#86efac;font-weight:900;font-size:13px}
+.dot-node.next .dot{background:var(--green);border-color:#f5d76e;animation:blink .8s infinite;box-shadow:0 0 14px var(--green)}
+.dot-node.next .nm{color:#86efac;font-weight:700}
+.dot-node.passed .dot{background:#4a4232;opacity:.4}
+.dot-node.passed .nm{color:#5a5240}
+@keyframes blink{50%{opacity:.35;transform:scale(.85)}}
+.track-header{text-align:center;padding:10px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
+.track-plate{font-size:22px;font-weight:900;background:linear-gradient(135deg,#f5d76e,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
+.track-station{font-size:18px;font-weight:800;color:var(--green);margin:6px 0;text-shadow:0 0 12px rgba(34,197,94,.4)}
+.track-next{font-size:13px;color:var(--gold-b)}
+.track-count{font-size:32px;font-weight:900;color:var(--gold-b);margin:4px 0;text-shadow:0 0 20px rgba(212,175,55,.4)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.modal.active{display:flex}
+.modal-card{background:linear-gradient(145deg,#1a150d,#0a0805);border-radius:20px;padding:22px;max-width:400px;width:100%;border:2px solid var(--gold);box-shadow:0 20px 60px rgba(212,175,55,.35);max-height:90vh;overflow-y:auto}
+.modal-card h2{font-size:18px;color:var(--gold-b);margin-bottom:12px;text-align:center}
+.notif-card{border-color:var(--gold-b);animation:goldPulse .8s ease-in-out infinite alternate}
+@keyframes goldPulse{from{box-shadow:0 0 20px rgba(212,175,55,.4)}to{box-shadow:0 0 50px rgba(212,175,55,.9)}}
+.notif-body{font-size:15px;line-height:1.6;color:var(--txt);margin:14px 0}
+.stat-box{background:#0a0805;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;flex:1}
+.stat-box .label{font-size:11px;color:var(--txt2)}
+.stat-box .value{font-size:20px;font-weight:900;color:var(--gold-b);margin-top:2px}
+.admin-list{font-size:12px;color:var(--txt2);line-height:1.7;max-height:200px;overflow-y:auto;background:#0a0805;padding:8px;border-radius:8px;border:1px solid var(--line)}
+.admin-list .item{padding:5px 0;border-bottom:1px solid var(--line)}
+.admin-list .item:last-child{border-bottom:none}
+.admin-list .item b{color:var(--gold-b)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧍 乘客專用端 · 浚鍵管理</h1>
+  <div>
+    <button onclick="speakPage()">🔊</button>
+    <a href="index.html">← 首頁</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 登入 -->
+  <div id="login-view" class="card">
+    <div class="card-title">🔐 登入</div>
+    <label>電話號碼 / 管理員電郵</label>
+    <input type="text" id="p-phone" placeholder="91234567 或 admin@gmail.com">
+    <label>您的姓名（乘客填寫）</label>
+    <input type="text" id="p-name" placeholder="例如：陳先生" maxlength="20">
+    <button class="btn btn-gold" onclick="doLogin()">立即登入</button>
+    <div id="login-err" style="color:var(--red);font-size:13px;text-align:center;margin-top:8px"></div>
+    <div style="font-size:12px;color:var(--txt2);margin-top:12px;line-height:1.6">💡 管理員可使用電郵登入以查看後台。</div>
+  </div>
+
+  <!-- 主介面 -->
+  <div id="main-view" style="display:none">
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px">
+      <div>
+        <div id="p-welcome" style="font-size:15px;font-weight:700;color:var(--gold-b)">👤</div>
+        <div id="p-phone-disp" style="font-size:12px;color:var(--txt2)"></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">登出</button>
+    </div>
+
+    <!-- 管理員入口 -->
+    <button class="btn btn-warn" id="admin-entry-btn" style="display:none;margin-bottom:10px"
+            onclick="openAdminModal()">👑 進入後台</button>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-booking" onclick="switchTab('booking')">🎫 留位</button>
+      <button class="tab-btn" id="tab-mine" onclick="switchTab('mine')">📋 我的預約</button>
+      <button class="tab-btn" id="tab-track" onclick="switchTab('track')">🚐 追蹤</button>
+      <button class="tab-btn" id="tab-msg" onclick="switchTab('msg')">💬 訊息</button>
+    </div>
+
+    <!-- 留位（獨立頁） -->
+    <div id="panel-booking">
+      <div class="card">
+        <div class="card-title">🌅 早上固定班次</div>
+        <div id="shift-morning"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🌆 傍晚固定班次</div>
+        <div id="shift-evening"></div>
+      </div>
+      <div class="card" id="loop-card" style="display:none">
+        <div class="card-title">🔄 循環線留位（07:00 - 18:00）</div>
+        <div id="loop-content"></div>
+      </div>
+    </div>
+
+    <!-- 我的預約 -->
+    <div id="panel-mine" style="display:none">
+      <div class="card">
+        <div class="card-title">📋 我的預約與車牌</div>
+        <div id="my-bookings"></div>
+      </div>
+    </div>
+
+    <!-- 追蹤小巴 -->
+    <div id="panel-track" style="display:none">
+      <div class="card" id="bus-list-card">
+        <div class="card-title">🚐 選擇要追蹤嘅小巴</div>
+        <div id="bus-list">載入中…</div>
+      </div>
+      <div id="track-panel" style="display:none">
+        <div class="card">
+          <div class="track-header">
+            <div class="track-plate" id="tr-plate">--</div>
+            <div class="track-station" id="tr-station">--</div>
+            <div class="track-next" id="tr-next">下一站：--</div>
+            <div class="track-count" id="tr-count">0</div>
+            <div style="font-size:11px;color:var(--txt2)">目前乘客 / <span id="tr-seats">16</span> 座</div>
+          </div>
+          <div class="route-strip" id="tr-route-strip"></div>
+          <button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" onclick="stopTrack()">← 返回小巴列表</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 訊息 -->
+    <div id="panel-msg" style="display:none">
+      <div class="card">
+        <div class="card-title">💬 向司機發送訊息</div>
+        <label>選擇車輛</label>
+        <select id="msg-bus"><option value="">-- 請選擇 --</option></select>
+        <div class="row" style="margin:0">
+          <input id="msg-input" placeholder="輸入訊息…" style="margin:0">
+          <button class="btn btn-gold" onclick="sendMsg()" style="width:auto;flex:0 0 auto;padding:12px 18px;margin:0">發送</button>
+        </div>
+        <button class="btn btn-warn" id="btn-record" style="margin-top:8px">🎤 錄製語音訊息</button>
+        <div id="record-controls" class="rec-controls">
+          <button class="rec-stop" onclick="stopRecord()">✅ 發送語音</button>
+          <button class="rec-cancel" onclick="cancelRecord()">❌ 取消</button>
+        </div>
+        <div id="rec-status" class="rec-status"><div class="rec-dot"></div><span>錄音中... <span id="rec-time">0</span>s</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📨 訊息記錄</div>
+        <div id="msg-history" style="max-height:220px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 通知彈窗 -->
+<div class="modal" id="notif-modal">
+  <div class="modal-card notif-card">
+    <h2 id="notif-title">🔔 通知</h2>
+    <div class="notif-body" id="notif-body"></div>
+    <button class="btn btn-gold" onclick="closeNotif()">知道了</button>
+  </div>
+</div>
+
+<!-- 管理員後台 Modal -->
+<div class="modal" id="admin-modal">
+  <div class="modal-card" style="border-color:var(--gold-b);max-width:500px">
+    <h2>👑 總管後台</h2>
+    <div class="row" style="text-align:center;margin-bottom:12px">
+      <div class="stat-box"><div class="label">🚐 在線</div><div class="value" id="pa-buses">0</div></div>
+      <div class="stat-box"><div class="label">📋 留位</div><div class="value" id="pa-bookings">0</div></div>
+      <div class="stat-box"><div class="label">🔄 循環</div><div class="value" id="pa-loop">0</div></div>
+    </div>
+    <div class="admin-list" id="pa-bus-list" style="margin-bottom:10px;max-height:140px"></div>
+    <div class="admin-list" id="pa-stats" style="margin-bottom:10px;max-height:120px"></div>
+    <button class="btn btn-gold" onclick="closeAdminModal()">關閉</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAX7Zy5br1ozGOGxHvDeFNY-Ldcjjw8Qgc",
+  authDomain: "triple-login-version.firebaseapp.com",
+  databaseURL: "https://triple-login-version-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "triple-login-version",
+  storageBucket: "triple-login-version.firebasestorage.app",
+  messagingSenderId: "66459706459",
+  appId: "1:66459706459:web:28f99a455652f393da0b7e"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+const SM = ['06:20','06:30','06:40','06:50'];
+const SE = ['18:15','18:30','18:45','19:00','19:15','19:30','19:45','20:00','20:20'];
+const LOOP_START = 7, LOOP_END = 18;
+
+const ROUTES = {
+  busy: {
+    go:{name:["大棠黃泥墩","大棠山路巴士站","大棠村迴旋處","群潤花園","曉門","南坑排巴士站","南坑村","紅棗田","水喉頭","崇正公立學校","崇正新村","天龍花園","深涌村","禮修村巴士站","蝶翠峰巴士站","大旗嶺浸信會教堂","富達廣場巴士站","合益路","鳳翔路","大馬路燈位","元朗港鐵站"]},
+    back:{name:["元朗港鐵站","朗和路","鳳翔路","合益路","富達廣場","蝶翠峰","禮修村","深涌村","天龍花園","田寮村","崇正新村","水喉頭","菜站","麥園","老圍","新路口","南坑村","棠景花園","南坑排","新樓","教堂","振南苑","山咀","大棠村","金龍花園","大棠山路","巴士站","宏基","大棠黃泥墩"]}
+  },
+  normal: {
+    go:{name:["大棠黃泥墩","大棠山路巴士站","大棠村迴旋處","群潤花園","曉門","南坑排巴士站","南坑村","紅棗田","水喉頭","崇正公立學校","崇正新村","天龍花園","深涌村","禮修村巴士站","蝶翠峰巴士站","大旗嶺浸信會教堂","富達廣場巴士站","教育路麥當勞","鄉議局中學","大球場","元朗廣場","余仁生","家居站","元朗港鐵站"]},
+    back:{name:["元朗港鐵站","朗和路","鳳翔路","合益路","富達廣場","蝶翠峰","禮修村","深涌村","天龍花園","田寮村","崇正新村","水喉頭","菜站","麥園","老圍","新路口","南坑村","棠景花園","南坑排","新樓","教堂","振南苑","山咀","大棠村","金龍花園","大棠山路","巴士站","宏基","大棠黃泥墩"]}
+  }
+};
+
+let currentPassenger = null;
+let activeTab = 'booking';
+let isAdmin = false;
+let isSuperAdmin = false;
+
+let busListRef=null, myBookingRef=null, shiftClaimRef=null, trackBusRef=null, msgRef=null, activeLoopRef=null;
+let claimsCache={};
+let myBookingsCache={};
+let loopCache={};
+let knownBookingStatus={};
+let firstBookingLoad=true;
+let trackingPlate=null;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const getToday=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+const getDir=t=>parseInt(t.split(':')[0])<12?'morning':'evening';
+const getOrigL=t=>getDir(t)==='morning'?'🌅 大棠黃泥墩開出':'🌆 元朗港鐵站 H 出口開出';
+const now=()=>Date.now();
+const getSid=(date,time)=>date+'_'+time.replace(':','');
+const isLoopTime=()=>{const h=new Date().getHours();return h>=LOOP_START&&h<LOOP_END;};
+
+function toast(m,d=3000){
+  const t=$('toast');
+  t.textContent=m;t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),d);
+}
+function playAudio(b64){
+  if(!b64)return;
+  try{const a=new Audio('data:audio/webm;base64,'+b64);a.volume=1;a.play().catch(()=>{});}catch(e){}
+}
+
+/* 聲音 */
+function beep(hi=false){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=hi?1320:880;g.gain.value=.35;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.2);}catch(e){}}
+function playAlert(){beep(false);setTimeout(()=>beep(true),260);setTimeout(()=>beep(false),520);}
+function vibrate(ms){try{if(navigator.vibrate)navigator.vibrate(ms||100);}catch(e){}}
+
+/* 粵語 */
+let speakQueue=[],speakBusy=false;
+function speak(text){
+  if(!window.speechSynthesis||!text)return;
+  if(speakQueue.length>3)speakQueue.shift();
+  speakQueue.push(text);processSpeak();
+}
+function processSpeak(){
+  if(speakBusy||!speakQueue.length)return;
+  speakBusy=true;
+  const text=speakQueue.shift();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='zh-HK';u.rate=.9;u.volume=1;
+  const voices=window.speechSynthesis.getVoices();
+  const v=voices.find(x=>x.lang==='zh-HK')||voices.find(x=>x.lang.startsWith('zh'));
+  if(v)u.voice=v;
+  u.onend=u.onerror=()=>{speakBusy=false;setTimeout(processSpeak,80);};
+  window.speechSynthesis.speak(u);
+}
+function speakPage(){
+  speak('歡迎使用浚鍵管理有限公司乘客專用端。呢度可以留位、查看你嘅預約、追蹤小巴位置、同埋向司機發送訊息。');
+}
+
+/* 通知彈窗 */
+let notifQueue=[],notifShowing=false;
+function showNotif(title,bodyHTML,speakText){
+  notifQueue.push({title,bodyHTML,speakText});processNotifQueue();
+}
+function processNotifQueue(){
+  if(notifShowing||!notifQueue.length)return;
+  notifShowing=true;
+  const n=notifQueue.shift();
+  $('notif-title').textContent=n.title;
+  $('notif-body').innerHTML=n.bodyHTML;
+  $('notif-modal').classList.add('active');
+  playAlert();vibrate([300,100,300]);
+  if(n.speakText)speak(n.speakText);
+}
+function closeNotif(){$('notif-modal').classList.remove('active');notifShowing=false;setTimeout(processNotifQueue,400);}
+
+/* 錄音 */
+const RecorderManager={
+  instances:{},
+  create(id,onSend){
+    if(this.instances[id])return this.instances[id];
+    let mr=null,stream=null,chunks=[],timer=null,sec=0,isRec=false;
+    const self={id};
+    self.start=()=>{
+      if(isRec)return;isRec=true;
+      navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{
+        stream=s;
+        try{mr=new MediaRecorder(s,{audioBitsPerSecond:24000,mimeType:'audio/webm;codecs=opus'});}
+        catch(e){mr=new MediaRecorder(s,{audioBitsPerSecond:24000});}
+        chunks=[];mr.ondataavailable=e=>chunks.push(e.data);mr.start();sec=0;
+        const st=$(id+'-rec-status');if(st)st.style.display='flex';
+        const tm=$(id+'-rec-time');if(tm)tm.textContent='0';
+        timer=setInterval(()=>{sec++;if(tm)tm.textContent=sec;if(sec>=30)self.stop();},1000);
+      }).catch(()=>{toast('❌ 無法開啟咪高峰');isRec=false;});
+    };
+    self.stop=()=>{
+      if(!isRec)return;isRec=false;
+      if(timer){clearInterval(timer);timer=null;}
+      if(mr&&mr.state==='recording'){
+        mr.onstop=()=>{
+          const blob=new Blob(chunks,{type:'audio/webm'});
+          const reader=new FileReader();
+          reader.onload=()=>{if(onSend)onSend(reader.result.split(',')[1]);};
+          reader.readAsDataURL(blob);
+          if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+        };
+        mr.stop();
+      }
+      const st=$(id+'-rec-status');if(st)st.style.display='none';
+    };
+    self.cancel=()=>{
+      if(!isRec)return;isRec=false;
+      if(timer){clearInterval(timer);timer=null;}
+      if(mr&&mr.state==='recording')mr.stop();
+      if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+      const st=$(id+'-rec-status');if(st)st.style.display='none';
+      toast('❌ 錄音已取消');
+    };
+    self.isRecording=()=>isRec;
+    this.instances[id]=self;return self;
+  },
+  get(id){return this.instances[id];}
+};
+
+/* ===== 角色判斷（查 admins 節點，冇硬編碼） ===== */
+async function checkUserRole(input){
+  if(!input)return{role:'passenger',super:false};
+  if(!input.includes('@'))return{role:'passenger',super:false};
+  const e=input.toLowerCase();
+  try{
+    let snap=await db.ref('admins').orderByChild('email').equalTo(e).once('value');
+    if(!snap.exists()){
+      snap=await db.ref('admins').orderByChild('identifier').equalTo(e).once('value');
+    }
+    if(snap.exists()){
+      let isSuper=false;
+      snap.forEach(c=>{if(c.val().super===true)isSuper=true;});
+      return{role:'admin',super:isSuper};
+    }
+  }catch(err){}
+  return{role:'passenger',super:false};
+}
+
+/* ===== 登入 ===== */
+async function doLogin(){
+  const input=$('p-phone').value.trim();
+  const name=$('p-name').value.trim();
+  if(!input){$('login-err').textContent='請輸入電話或電郵';return;}
+
+  const isEmail=input.includes('@');
+  let role='passenger';
+  let isSuper=false;
+
+  if(isEmail){
+    const r=await checkUserRole(input);
+    role=r.role;isSuper=r.super;
+  }else{
+    if(!/^\d{8}$/.test(input)){$('login-err').textContent='請輸入 8 位數字電話';return;}
+    if(!name){$('login-err').textContent='請輸入姓名';return;}
+  }
+
+  const finalName=name||input.split('@')[0];
+
+  $('login-err').textContent='登入中...';
+  try{
+    await auth.signInAnonymously();
+    const uid=auth.currentUser.uid;
+    currentPassenger={uid,phone:input,name:finalName,role,super:isSuper};
+    isAdmin=(role==='admin');
+    isSuperAdmin=isSuper;
+    localStorage.setItem('pax_session',JSON.stringify(currentPassenger));
+
+    await db.ref('booking_passengers/'+input).update({
+      name:finalName,phone:input,role,super:isSuper,lastLogin:now()
+    });
+
+    initUI();
+    if(isAdmin){
+      $('admin-entry-btn').style.display='block';
+      $('admin-entry-btn').textContent=isSuperAdmin?'👑 進入超管後台':'👑 進入總管後台';
+    }
+    toast('✅ 登入成功：'+finalName+(isSuperAdmin?'（超級管理員）':isAdmin?'（管理員）':''));
+    speak(isSuperAdmin?'超級管理員登入成功':isAdmin?'管理員登入成功':'歡迎 '+finalName);
+  }catch(e){$('login-err').textContent='登入失敗：'+e.message;}
+}
+
+function doLogout(){
+  if(!confirm('確定登出？'))return;
+  currentPassenger=null;
+  localStorage.removeItem('pax_session');
+  [myBookingRef,shiftClaimRef,busListRef,trackBusRef,msgRef,activeLoopRef].forEach(r=>{try{r&&r.off();}catch(e){}});
+  location.reload();
+}
+
+function initUI(){
+  if(!currentPassenger){$('login-view').style.display='block';$('main-view').style.display='none';return;}
+  $('login-view').style.display='none';
+  $('main-view').style.display='block';
+  $('p-welcome').textContent='👤 '+currentPassenger.name;
+  $('p-phone-disp').textContent=currentPassenger.phone;
+  loadShiftClaims();
+  loadMyBookings();
+  loadBusList();
+  loadLoop();
+  loadMsgHistory();
+  setupRecorder();
+}
+
+/* Tab */
+function switchTab(tab){
+  activeTab=tab;
+  ['booking','mine','track','msg'].forEach(k=>{
+    const b=$('tab-'+k);const p=$('panel-'+k);
+    if(b)b.className='tab-btn'+(k===tab?' active':'');
+    if(p)p.style.display=(k===tab?'block':'none');
+  });
+  if(tab==='booking'){loadShiftClaims();loadLoop();}
+  if(tab==='mine')loadMyBookings();
+  if(tab==='track')loadBusList();
+  if(tab==='msg')loadBusList();
+}
+
+/* 班次認領 */
+function loadShiftClaims(){
+  if(shiftClaimRef){try{shiftClaimRef.off();}catch(e){}}
+  shiftClaimRef=db.ref('booking_seats/'+getToday());
+  shiftClaimRef.on('value',s=>{claimsCache=s.val()||{};renderShifts();});
+}
+function renderShifts(){
+  $('shift-morning').innerHTML=SM.map(tm=>renderShiftCard(tm)).join('');
+  $('shift-evening').innerHTML=SE.map(tm=>renderShiftCard(tm)).join('');
+}
+function renderShiftCard(tm){
+  const hhmm=tm.replace(':','');
+  const claim=claimsCache[hhmm]||{};
+  const plate=claim.plate||null;
+  const today=getToday();
+  const sid=getSid(today,tm);
+  const items=Object.values(myBookingsCache).filter(b=>b&&b.scheduleId===sid&&['pending','reserved','boarded'].includes(b.status));
+  const used=items.reduce((s,b)=>s+(b.seats||1),0);
+  const rem=16-used;
+  const full=rem<=0;
+  return `<div class="pax-card ${full?'full':''}" onclick="openBooking('${tm}')">
+    <div>
+      <div class="time">${tm}</div>
+      <div class="info">${getOrigL(tm)}</div>
+      ${plate?`<div class="plate">🚐 負責車牌：${esc(plate)}</div>`:'<div class="plate wait">⏳ 車輛待認領</div>'}
+    </div>
+    <div style="text-align:right">
+      <div class="num">${rem}</div>
+      <div style="font-size:10px;color:var(--txt2)">剩餘</div>
+    </div>
+  </div>`;
+}
+
+/* 循環線 */
+function loadLoop(){
+  $('loop-card').style.display=isLoopTime()?'block':'none';
+  if(!isLoopTime())return;
+  if(activeLoopRef){try{activeLoopRef.off();}catch(e){}}
+  activeLoopRef=db.ref('booking_loop/'+getToday());
+  activeLoopRef.on('value',s=>{loopCache=s.val()||{};renderLoop();});
+}
+function renderLoop(){
+  const mine=Object.entries(loopCache).find(([k,x])=>x.phone===currentPassenger.phone&&(x.status==='pending'||x.status==='reserved'));
+  if(mine){
+    const [id,x]=mine;
+    const status=x.status==='pending'?'⏳ 等待司機確認':'✅ 已確認留位';
+    const color=x.status==='pending'?'var(--yellow)':'var(--green)';
+    $('loop-content').innerHTML=`
+      <div style="background:#0a0805;border-radius:10px;padding:14px;border-left:3px solid ${color}">
+        <div style="font-size:15px;font-weight:700;color:${color}">${status}</div>
+        ${x.pickupLocation?`<div style="font-size:12px;color:var(--txt2);margin-top:6px">📍 ${esc(x.pickupLocation)}</div>`:''}
+        ${x.confirmedBy?`<div style="font-size:13px;color:var(--gold-b);font-weight:700;margin-top:6px">🚐 負責車牌：${esc(x.confirmedBy)}</div>`:''}
+        ${x.status==='reserved'?`<button class="btn btn-success" style="margin-top:10px" onclick="loopBoarded('${id}')">🚐 我已上車</button>`:''}
+        <button class="btn btn-outline" style="margin-top:8px" onclick="loopCancel('${id}')">取消留位</button>
+      </div>`;
+    return;
+  }
+  $('loop-content').innerHTML=`
+    <label>📍 上車地點</label>
+    <input type="text" id="loop-pickup" placeholder="例如：大棠村迴旋處" maxlength="40">
+    <button class="btn btn-gold" onclick="loopJoin()">🔄 循環線留位</button>
+    <div style="font-size:11px;color:var(--txt2);margin-top:6px">循環線為即時留位，司機確認後會顯示車牌。</div>`;
+}
+async function loopJoin(){
+  const pickup=$('loop-pickup').value.trim();
+  if(!pickup)return toast('請輸入上車地點');
+  const t=getToday();
+  const exists=Object.values(loopCache).find(x=>x.phone===currentPassenger.phone&&(x.status==='pending'||x.status==='reserved'));
+  if(exists)return toast('⚠️ 你已經有循環線留位');
+  await db.ref('booking_loop/'+t).push({
+    phone:currentPassenger.phone,name:currentPassenger.name,seats:1,
+    status:'pending',date:t,pickupLocation:pickup,createdAt:now()
+  });
+  toast('✅ 已送出，等待司機確認');
+}
+async function loopCancel(id){
+  if(!confirm('確定取消循環線留位？'))return;
+  await db.ref('booking_loop/'+getToday()+'/'+id).update({status:'cancelled',cancelledAt:now()});
+  toast('已取消');
+}
+async function loopBoarded(id){
+  if(!confirm('確定你已上車？'))return;
+  await db.ref('booking_loop/'+getToday()+'/'+id).update({status:'boarded',boardedAt:now()});
+  toast('✅ 已記錄上車');
+}
+
+/* 留位表單 */
+function openBooking(tm){
+  const plate=(claimsCache[tm.replace(':','')]||{}).plate;
+  $('panel-booking').innerHTML=`
+    <div class="card">
+      <button class="btn btn-outline btn-sm" onclick="switchTab('booking')">← 返回班次列表</button>
+    </div>
+    <div class="card">
+      <div class="card-title">🎫 ${tm} 班次留位</div>
+      <div style="font-size:13px;color:var(--txt2);margin-bottom:8px">${getOrigL(tm)}</div>
+      <div style="font-size:14px;color:${plate?'var(--green)':'var(--txt2)'};font-weight:700;margin-bottom:12px">
+        ${plate?'🚐 負責車牌：'+esc(plate):'⏳ 車輛待司機認領'}
+      </div>
+      <label>姓名</label>
+      <input type="text" id="bk-name" value="${esc(currentPassenger.name)}">
+      <label>人數</label>
+      <select id="bk-seats"><option value="1">1 位</option><option value="2">2 位</option></select>
+      <label>📍 上車地點</label>
+      <input type="text" id="bk-pickup" placeholder="例如：大棠村迴旋處" maxlength="40">
+      <button class="btn btn-gold" onclick="submitBooking('${tm}')">📩 送出留位申請</button>
+    </div>`;
+}
+async function submitBooking(tm){
+  const name=$('bk-name').value.trim();
+  const seats=parseInt($('bk-seats').value);
+  const pickup=$('bk-pickup').value.trim();
+  if(!name||!pickup)return toast('請填寫姓名與上車地點');
+  const today=getToday();
+  const sid=today+'_'+tm.replace(':','');
+  try{
+    const snap=await db.ref('booking/'+today).once('value');
+    const all=snap.val()||{};
+    const dup=Object.values(all).find(b=>b.scheduleId===sid&&b.passengerPhone===currentPassenger.phone&&b.status!=='cancelled'&&b.status!=='rejected');
+    if(dup)return toast('⚠️ 你已經預約咗呢個班次');
+    await db.ref('booking/'+today).push({
+      scheduleId:sid,date:today,time:tm,
+      passengerName:name,passengerPhone:currentPassenger.phone,
+      seats,pickupLocation:pickup,status:'pending',createdAt:now()
+    });
+    toast('✅ 留位申請已送出，等待司機確認');
+    setTimeout(()=>switchTab('mine'),700);
+  }catch(e){toast('❌ '+e.message);}
+}
+
+/* 我的預約 */
+function loadMyBookings(){
+  if(myBookingRef){try{myBookingRef.off();}catch(e){}}
+  const today=getToday();
+  myBookingRef=db.ref('booking/'+today);
+  myBookingRef.on('value',snap=>{
+    const all=snap.val()||{};
+    const mine=Object.entries(all)
+      .filter(([k,b])=>b.passengerPhone===currentPassenger.phone&&b.status!=='cancelled'&&b.status!=='rejected')
+      .map(([k,b])=>({id:k,...b}));
+
+    if(!firstBookingLoad){
+      mine.forEach(b=>{
+        const prev=knownBookingStatus[b.id];
+        if(prev==='pending'&&b.status==='reserved'){
+          showNotif('✅ 留位已確認！',
+            `<div><b>${b.time} 班次</b><br>`+
+            (b.confirmedBy?`🚐 負責車牌：<b style="color:var(--gold-b)">${esc(b.confirmedBy)}</b><br>`:'')+
+            `📍 ${esc(b.pickupLocation||'')}</div>`,
+            '留位已確認，'+b.time+' 班次'+(b.confirmedBy?'，車牌 '+b.confirmedBy:''));
+        }
+      });
+    }
+    knownBookingStatus={};
+    mine.forEach(b=>{knownBookingStatus[b.id]=b.status;});
+    firstBookingLoad=false;
+    myBookingsCache=all;
+    renderMyBookings(mine);
+    renderShifts();
+  });
+}
+function renderMyBookings(list){
+  const c=$('my-bookings');
+  if(!list.length){
+    c.innerHTML='<div style="text-align:center;color:var(--txt2);padding:20px;font-size:13px">你今日暫無預約記錄<br>請到「留位」分頁選擇班次</div>';
+    return;
+  }
+  list.sort((a,b)=>a.time.localeCompare(b.time));
+  let h='';
+  list.forEach(b=>{
+    const badge=b.status==='pending'?'<span class="badge badge-yellow">⏳ 待確認</span>'
+      :b.status==='reserved'?'<span class="badge badge-green">✅ 已確認</span>'
+      :b.status==='boarded'?'<span class="badge badge-blue">🚐 已上車</span>'
+      :'<span class="badge">'+b.status+'</span>';
+    h+='<div class="my-booking '+b.status+'">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    h+='<div style="font-size:15px;font-weight:700;color:var(--txt)">'+b.time+' 班次 ('+(b.seats||1)+'位)</div>';
+    h+='<div>'+badge+'</div></div>';
+    h+='<div style="font-size:12px;color:var(--txt2);margin-top:4px">'+getOrigL(b.time)+'</div>';
+    if(b.pickupLocation)h+='<div style="font-size:12px;color:var(--green);margin-top:2px">📍 '+esc(b.pickupLocation)+'</div>';
+    if(b.confirmedBy)h+='<div style="font-size:13px;color:var(--gold-b);font-weight:700;margin-top:4px">🚐 負責車牌：'+esc(b.confirmedBy)+'</div>';
+    h+='<div style="display:flex;gap:6px;margin-top:8px">';
+    if(b.status==='reserved')h+='<button class="btn btn-success btn-sm" style="flex:1;margin:0" onclick="paxBoarded(\''+b.id+'\',\''+b.date+'\')">🚐 我已上車</button>';
+    h+='<button class="btn btn-outline btn-sm" style="flex:1;margin:0" onclick="paxCancel(\''+b.id+'\',\''+b.date+'\')">取消預約</button>';
+    h+='</div></div>';
+  });
+  c.innerHTML=h;
+}
+async function paxBoarded(id,date){
+  if(!confirm('確定你已上車？'))return;
+  try{await db.ref('booking/'+date+'/'+id).update({status:'boarded',boardedAt:now()});toast('✅ 已記錄上車');speak('已記錄上車');}
+  catch(e){toast('❌ '+e.message);}
+}
+async function paxCancel(id,date){
+  if(!confirm('確定取消預約？'))return;
+  try{await db.ref('booking/'+date+'/'+id).update({status:'cancelled',cancelledAt:now()});toast('已取消');}
+  catch(e){toast('❌ '+e.message);}
+}
+
+/* 追蹤小巴 */
+function loadBusList(){
+  if(busListRef){try{busListRef.off();}catch(e){}}
+  busListRef=db.ref('van/active_buses');
+  busListRef.on('value',snap=>{
+    const d=snap.val()||{};
+    const nw=now();
+    const buses=Object.entries(d)
+      .filter(([p,b])=>nw-(b.lastUpdate||0)<300000)
+      .map(([p,b])=>({plate:p,...b}));
+    const list=$('bus-list');
+    const sel=$('msg-bus');
+    if(!buses.length){
+      list.innerHTML='<div style="text-align:center;color:var(--txt2);padding:16px;font-size:13px">目前沒有在線小巴</div>';
+    }else{
+      list.innerHTML=buses.map(b=>`
+        <div class="bus-card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:18px;font-weight:800;color:var(--gold-b)">🚐 ${esc(b.plate)}</div>
+            <div style="font-size:20px;font-weight:900;color:${b.isFull?'var(--red)':'var(--green)'}">${b.isFull?'滿座':(b.passengerCount||0)+'人'}</div>
+          </div>
+          <div style="font-size:13px;color:var(--txt2);margin-top:6px">📍 目前：${esc(b.currentStation||'未知')}</div>
+          <div style="font-size:12px;color:var(--gold-b);margin-top:2px">➡️ 下一站：${esc(b.nextStation||'終點')}</div>
+          <button class="btn btn-gold" style="margin-top:10px" onclick="startTrack('${esc(b.plate)}')">📍 即時追蹤路線</button>
+        </div>`).join('');
+    }
+    if(sel){
+      sel.innerHTML='<option value="">-- 請選擇 --</option>'+
+        buses.map(b=>`<option value="${esc(b.plate)}">🚐 ${esc(b.plate)}</option>`).join('');
+    }
+  });
+}
+function startTrack(plate){
+  trackingPlate=plate;
+  $('bus-list-card').style.display='none';
+  $('track-panel').style.display='block';
+  if(trackBusRef){try{trackBusRef.off();}catch(e){}}
+  trackBusRef=db.ref('van/active_buses/'+plate);
+  trackBusRef.on('value',snap=>{
+    const b=snap.val();
+    if(!b){$('tr-plate').textContent=plate+' (已離線)';return;}
+    $('tr-plate').textContent='🚐 '+plate;
+    const route=b.mode==='busy'?ROUTES.busy:ROUTES.normal;
+    const routeArr=b.direction===0?route.go.name:route.back.name;
+    const idx=b.stationIndex||0;
+    $('tr-station').textContent=routeArr[idx]||'--';
+    $('tr-next').textContent='下一站：'+(routeArr[idx+1]||'終點');
+    $('tr-count').textContent=b.isFull?'🚫 滿座':(b.passengerCount||0);
+    $('tr-seats').textContent=b.carSeats||16;
+    renderRouteStrip(routeArr,idx);
+  });
+}
+function stopTrack(){
+  trackingPlate=null;
+  if(trackBusRef){try{trackBusRef.off();}catch(e){}trackBusRef=null;}
+  $('track-panel').style.display='none';
+  $('bus-list-card').style.display='block';
+}
+function renderRouteStrip(routeArr,currentIdx){
+  const strip=$('tr-route-strip');
+  strip.innerHTML='';
+  routeArr.forEach((name,i)=>{
+    const node=document.createElement('div');
+    node.className='dot-node';
+    if(i<currentIdx)node.classList.add('passed');
+    else if(i===currentIdx)node.classList.add('current');
+    else if(i===currentIdx+1)node.classList.add('next');
+    node.innerHTML=`<div class="dot"></div><div class="nm">${esc(name)}</div>`;
+    strip.appendChild(node);
+  });
+  setTimeout(()=>{
+    const cur=strip.querySelector('.dot-node.current');
+    if(cur)cur.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  },120);
+}
+
+/* 訊息 */
+async function sendMsg(){
+  const bus=$('msg-bus').value;
+  const text=$('msg-input').value.trim();
+  if(!bus)return toast('請先選擇車輛');
+  if(!text)return toast('請輸入訊息');
+  await db.ref('van/messages').push({
+    busId:bus,senderUid:currentPassenger.uid,
+    senderIdentifier:currentPassenger.name+'('+currentPassenger.phone+')',
+    text,timestamp:now(),type:'text'
+  });
+  $('msg-input').value='';
+  toast('✅ 已發送');
+}
+function loadMsgHistory(){
+  if(msgRef){try{msgRef.off();}catch(e){}}
+  msgRef=db.ref('van/messages').orderByChild('timestamp').limitToLast(40);
+  msgRef.on('value',snap=>{
+    const c=$('msg-history');
+    if(!c)return;
+    const items=[];
+    snap.forEach(ch=>{
+      const m=ch.val();
+      if(m.hidden)return;
+      if(m.senderUid===currentPassenger.uid||m.busId==='broadcast')items.push(m);
+    });
+    items.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+    if(!items.length){c.innerHTML='<div style="color:var(--txt2);font-size:12px;padding:8px;text-align:center">暫無訊息</div>';return;}
+    c.innerHTML=items.slice(0,20).map(m=>{
+      const isMe=m.senderUid===currentPassenger.uid;
+      const time=m.timestamp?new Date(m.timestamp).toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit'}):'';
+      return `<div class="msg-row">
+        <span style="color:var(--txt2);font-size:11px">${time}</span>
+        <span style="color:${isMe?'var(--gold-b)':'var(--green)'};font-weight:700">${isMe?'我':esc(m.senderIdentifier||'?')}</span>
+        ${m.audio?`<button class="play-audio" onclick="playAudio('${m.audio}')">▶ 語音</button>`:`<span>${esc(m.text||'')}</span>`}
+      </div>`;
+    }).join('');
+  });
+}
+
+/* 錄音 */
+function setupRecorder(){
+  RecorderManager.create('',b64=>{
+    const bus=$('msg-bus').value;
+    if(!bus){toast('請先選擇車輛');return;}
+    db.ref('van/messages').push({
+      busId:bus,senderUid:currentPassenger.uid,
+      senderIdentifier:currentPassenger.name+'('+currentPassenger.phone+')',
+      audio:b64,timestamp:now(),type:'audio'
+    }).then(()=>toast('✅ 語音已發送'));
+  });
+  $('btn-record').addEventListener('click',()=>{
+    const bus=$('msg-bus').value;
+    if(!bus)return toast('請先選擇車輛');
+    const rec=RecorderManager.get('');
+    if(rec.isRecording())return;
+    rec.start();
+    $('record-controls').style.display='flex';
+    $('btn-record').style.display='none';
+  });
+}
+function stopRecord(){const rec=RecorderManager.get('');if(rec&&rec.isRecording())rec.stop();$('record-controls').style.display='none';$('btn-record').style.display='block';}
+function cancelRecord(){const rec=RecorderManager.get('');if(rec&&rec.isRecording())rec.cancel();$('record-controls').style.display='none';$('btn-record').style.display='block';}
+
+/* ===== 管理員後台 Modal ===== */
+function openAdminModal(){
+  if(!isAdmin)return toast('❌ 權限不足');
+  $('admin-modal').classList.add('active');
+  loadPaxAdminPanel();
+}
+function closeAdminModal(){$('admin-modal').classList.remove('active');}
+async function loadPaxAdminPanel(){
+  const busSnap=await db.ref('van/active_buses').once('value');
+  const buses=busSnap.val()||{};
+  const nw=now();
+  let h='',cnt=0;
+  Object.keys(buses).forEach(p=>{
+    const b=buses[p];
+    if(nw-(b.lastUpdate||0)<300000){
+      cnt++;
+      h+='<div class="item">🚐 <b>'+esc(p)+'</b> · '+esc(b.currentStation||'')+' · 👥 '+(b.passengerCount||0)+'/'+(b.carSeats||16)+'</div>';
+    }
+  });
+  $('pa-buses').textContent=cnt;
+  $('pa-bus-list').innerHTML=h||'<div class="item">暫無在線車輛</div>';
+
+  const t=getToday();
+  const bks=(await db.ref('booking/'+t).once('value')).val()||{};
+  const lps=(await db.ref('booking_loop/'+t).once('value')).val()||{};
+  $('pa-bookings').textContent=Object.keys(bks).length;
+  $('pa-loop').textContent=Object.keys(lps).length;
+
+  let pending=0,reserved=0,boarded=0;
+  Object.values(bks).forEach(b=>{
+    if(b.status==='pending')pending++;
+    else if(b.status==='reserved')reserved++;
+    else if(b.status==='boarded')boarded++;
+  });
+  $('pa-stats').innerHTML=
+    '<div class="item">⏳ 待確認：<b>'+pending+'</b></div>'+
+    '<div class="item">✅ 已確認：<b>'+reserved+'</b></div>'+
+    '<div class="item">🚐 已上車：<b>'+boarded+'</b></div>';
+}
+
+/* 啟動 */
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('pax_session');
+  if(saved){
+    try{
+      currentPassenger=JSON.parse(saved);
+      auth.onAuthStateChanged(u=>{
+        if(u)currentPassenger.uid=u.uid;
+        initUI();
+      });
+    }catch(e){initUI();}
+  }else{
+    initUI();
+  }
+});
+
+Object.assign(window,{
+  doLogin,doLogout,switchTab,openBooking,submitBooking,
+  paxBoarded,paxCancel,sendMsg,stopRecord,cancelRecord,
+  playAudio,speakPage,closeNotif,startTrack,stopTrack,
+  loopJoin,loopCancel,loopBoarded,
+  openAdminModal,closeAdminModal
+});
+</script>
+</body>
+</html>
