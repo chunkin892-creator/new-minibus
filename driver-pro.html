@@ -36,8 +36,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .btn-warn{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000}
 .btn-secondary{background:#1e1a12;color:var(--txt2);border:1px solid var(--line)}
 .btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold-b)}
-.btn-purple{background:linear-gradient(135deg,#bf5af2,#9333ea)}
-.btn-blue{background:linear-gradient(135deg,#0a84ff,#0066cc)}
 .btn-sm{padding:10px 14px;font-size:13px;width:auto;display:inline-block;margin:0 4px 4px 0}
 input,select,textarea{width:100%;padding:16px;border-radius:10px;border:1px solid var(--line);background:#000;color:var(--gold-l);font-size:17px;margin-bottom:10px;outline:none;font-family:inherit}
 input:focus,select:focus,textarea:focus{border-color:var(--gold-b);box-shadow:0 0 0 2px rgba(212,175,55,.25)}
@@ -490,6 +488,7 @@ label{display:block;font-size:14px;color:var(--txt2);margin-bottom:6px;font-weig
 
 <div class="toast" id="toast"></div>
 <div class="wake-status" id="wake-status">🔋 屏幕鎖: 未啟用</div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAX7Zy5br1ozGOGxHvDeFNY-Ldcjjw8Qgc",
@@ -1019,7 +1018,7 @@ function renderSeatView(){
   sel.innerHTML=myShifts.map(tm=>'<option value="'+tm+'"'+(tm===cur?' selected':'')+'>'+tm+' · '+getOrigL(tm)+'</option>').join('');
   const tm=sel.value||myShifts[0];
   const sid=getSid(getToday(),tm);
-  const items=Object.values(bookingsCache).filter(b=>b&&b.scheduleId===sid&&(b.status==='pending'||b.status==='reserved'||b.status==='boarded'));
+  const items=Object.entries(bookingsCache).filter(([k,b])=>b&&b.scheduleId===sid&&(b.status==='pending'||b.status==='reserved'||b.status==='boarded')).map(([k,b])=>({...b,id:k}));
   const confirmed=items.filter(b=>b.status==='reserved'||b.status==='boarded');
   const pending=items.filter(b=>b.status==='pending');
   const totalBooked=confirmed.reduce((s,b)=>s+(b.seats||1),0);
@@ -1122,6 +1121,7 @@ function startBookingListener(){
 
 async function confirmBooking(date, id){
   console.log('🔵 confirmBooking', date, id);
+  if(!id || id === 'undefined'){ toast('❌ 無效嘅預訂 ID'); console.error('❌ id is undefined'); return; }
   try{
     const snap=await db.ref('booking/'+date+'/'+id).once('value');
     const b=snap.val();
@@ -1149,7 +1149,6 @@ async function rejectBooking(date, id){
     await db.ref('booking/'+date+'/'+id).update({ status:'rejected', rejectedAt:now() });
     if(b.status==='reserved' && b.confirmedBy){
       await db.ref('van/active_buses/'+b.confirmedBy+'/passengerCount').transaction(c=>Math.max(0,(c||0)-(b.seats||1)));
-      console.log('✅ 拒絕並釋放座位');
     }
     toast('已拒絕');
   }catch(e){ toast('❌ '+e.message); }
