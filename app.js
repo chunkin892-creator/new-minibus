@@ -1,5 +1,5 @@
 /* ============================================================
- * app.js — 主程式（完整修復與防護增強版）
+ * app.js — 主程式（UI 修復與後台權限全開版）
  * ============================================================ */
 
 /* ---------- 全局音訊單例與基礎工具 ---------- */
@@ -77,7 +77,7 @@ function savePlate(identifier, plate) {
 function getRoute() { return getRouteByMode(driverData.mode, driverData.direction); }
 function getCoords() { return getCoordsByMode(driverData.mode, driverData.direction); }
 
-/* ---------- 播放語音（防止音訊上下文溢出） ---------- */
+/* ---------- 播放語音 ---------- */
 function playBoostedAudio(base64, boost = 7) {
   if (!base64) return;
   try {
@@ -190,28 +190,48 @@ function setupRecordButton(btnId, timerId, callback) {
 }
 window.setupRecordButton = setupRecordButton;
 
-/* ---------- 角色檢查 ---------- */
+/* ---------- 角色檢查（增強識別） ---------- */
 async function checkRole(identifier) {
   let role = 'passenger';
+  let isSuper = false;
   try {
     const adminSnap = await db.ref('admins').once('value');
     adminSnap.forEach(child => {
       const data = child.val();
-      if (data && (data.identifier === identifier || data.email === identifier || data.phone === identifier || data.uid === identifier)) {
+      if (data && (
+        data.identifier === identifier ||
+        data.email === identifier ||
+        data.phone === identifier ||
+        data.uid === identifier ||
+        child.key === safeKey(identifier)
+      )) {
         role = 'admin';
+        if (data.super === true || data.super === 'true') isSuper = true;
       }
     });
+
+    if (SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === (identifier || '').toLowerCase())) {
+      role = 'admin';
+      isSuper = true;
+    }
+
     if (role === 'passenger') {
       const driverSnap = await db.ref('drivers').once('value');
       driverSnap.forEach(child => {
         const data = child.val();
-        if (data && (data.identifier === identifier || data.email === identifier || data.phone === identifier || data.uid === identifier)) {
+        if (data && (
+          data.identifier === identifier ||
+          data.email === identifier ||
+          data.phone === identifier ||
+          data.uid === identifier ||
+          child.key === safeKey(identifier)
+        )) {
           role = 'driver';
         }
       });
     }
   } catch (e) { console.warn('檢查角色失敗:', e); }
-  return role;
+  return { role, isSuper };
 }
 
 /* ---------- 車牌設定 ---------- */
@@ -294,6 +314,7 @@ function switchDir() {
   if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese(VOICE_TEXTS.turnAround);
 }
 
+/* ---------- 路線切換（視覺與邏輯全面優化） ---------- */
 function toggleMode() {
   const next = driverData.mode === 'busy' ? 'normal' : 'busy';
   const name = next === 'busy' ? '西鐵快線' : '市中心循環線';
@@ -327,6 +348,7 @@ function updateDriverUI() {
   const station = route[idx] || '未知';
   const nextIdx = idx + 1 < route.length ? idx + 1 : 0;
   const nextStation = route[nextIdx] || '終點';
+  
   const infoEl = document.getElementById('d-info');
   if (infoEl) infoEl.textContent = '🚐 ' + (driverData.plate || '未設定') + ' | 司機: ' + (currentUser.identifier || '未登入');
   const stationEl = document.getElementById('d-station');
@@ -335,10 +357,33 @@ function updateDriverUI() {
   if (targetEl) targetEl.textContent = '下一站：' + nextStation;
   const passEl = document.getElementById('d-pass-count');
   if (passEl) passEl.textContent = driverData.passengerCount;
+  
+  // 模式標籤與按鈕樣式動態更新（解決白色、看不出掣問題）
   const modeBadge = document.getElementById('d-mode-badge');
-  if (modeBadge) modeBadge.textContent = driverData.mode === 'busy' ? '西鐵快線' : '市中心循環線';
+  const modeBtn = document.getElementById('d-mode-btn');
+  if (driverData.mode === 'busy') {
+    if (modeBadge) {
+      modeBadge.textContent = '西鐵快線';
+      modeBadge.className = 'badge badge-purple';
+    }
+    if (modeBtn) {
+      modeBtn.textContent = '🔄 切換路線：市中心循環線';
+      modeBtn.className = 'btn btn-mode-busy';
+    }
+  } else {
+    if (modeBadge) {
+      modeBadge.textContent = '市中心循環線';
+      modeBadge.className = 'badge badge-gold';
+    }
+    if (modeBtn) {
+      modeBtn.textContent = '🔄 切換路線：西鐵快線';
+      modeBtn.className = 'btn btn-mode-normal';
+    }
+  }
+  
   const dirBadge = document.getElementById('d-dir-badge');
   if (dirBadge) dirBadge.textContent = driverData.direction === 0 ? '往元朗' : '往大棠';
+  
   const fullBtn = document.getElementById('d-full-btn');
   if (fullBtn) {
     fullBtn.style.background = driverData.isFull ? 'linear-gradient(135deg,#f43f5e,#e11d48)' : 'linear-gradient(135deg,#10b981,#059669)';
@@ -393,7 +438,6 @@ function updateDriverDB() {
   updateDriverUI();
 }
 
-/* ---------- 開始與停止當值 ---------- */
 function startDuty() {
   if (!driverData.plate) { showToast('請先設定車牌'); return; }
   if (!navigator.geolocation) showToast('瀏覽器不支援 GPS，但仍可手動操作');
@@ -573,15 +617,22 @@ function startKickListener() {
   });
 }
 
+/* ---------- Tab 切換（修正後台面板顯示問題） ---------- */
 function switchTab(tabName) {
   ['duty','claim','seats','msg','walkie','admin'].forEach(k => {
     const p = document.getElementById('tab-' + k);
     if (p) p.style.display = (k === tabName ? 'block' : 'none');
   });
-  document.querySelectorAll('#main-tabs .tab').forEach(b => b.classList.remove('active'));
-  const idx = { duty: 0, claim: 1, seats: 2, msg: 3, walkie: 4, admin: 5 }[tabName];
-  const btns = document.querySelectorAll('#main-tabs .tab');
-  if (btns[idx]) btns[idx].classList.add('active');
+
+  const tabButtons = document.querySelectorAll('#main-tabs .tab');
+  tabButtons.forEach(b => b.classList.remove('active'));
+
+  const tabMap = { duty: 0, claim: 1, seats: 2, msg: 3, walkie: 4, admin: 5 };
+  const idx = tabMap[tabName];
+  if (idx !== undefined && tabButtons[idx]) {
+    tabButtons[idx].classList.add('active');
+  }
+
   if (tabName === 'seats' && typeof renderSeatView === 'function') {
     renderSeatView();
     renderLoopBookings();
@@ -594,6 +645,33 @@ function switchTab(tabName) {
 }
 window.switchTab = switchTab;
 
+/* ---------- 登入成功後處理後台按鈕及身份顯示 ---------- */
+function applyUserRoleUI() {
+  const adminBtn = document.getElementById('tab-admin-btn');
+  const title = document.getElementById('admin-title');
+  const roleDisp = document.getElementById('my-role-display');
+
+  if (isAdmin) {
+    if (adminBtn) {
+      adminBtn.style.display = 'inline-block';
+      adminBtn.textContent = isSuperAdmin ? '👑 超管後台' : '👑 總管後台';
+    }
+    if (title) title.textContent = isSuperAdmin ? '超管後台' : '總管後台';
+    if (roleDisp) roleDisp.textContent = (isSuperAdmin ? '👑 超級管理員' : '👤 普通管理員') + '（' + currentUser.identifier + '）';
+    
+    if (isSuperAdmin) {
+      const sec = document.getElementById('admin-section-manage-admins');
+      if (sec) sec.style.display = 'block';
+      const tb = document.getElementById('tab-manage-admins');
+      if (tb) tb.style.display = 'block';
+      if (typeof loadAdminList === 'function') loadAdminList();
+    }
+  } else {
+    if (adminBtn) adminBtn.style.display = 'none';
+    if (roleDisp) roleDisp.textContent = '🚏 司機（' + currentUser.identifier + '）';
+  }
+}
+
 async function doLogin() {
   const id = document.getElementById('login-id').value.trim();
   if (!id) { document.getElementById('login-err').textContent = '請輸入電話或電郵'; return; }
@@ -603,38 +681,27 @@ async function doLogin() {
   try {
     await auth.signInAnonymously();
     const uid = auth.currentUser.uid;
-    const role = await checkRole(id);
+    const { role, isSuper } = await checkRole(id);
+    
     if (role !== 'driver' && role !== 'admin') {
-      document.getElementById('login-err').textContent = '❌ 你不是司機或管理員';
+      document.getElementById('login-err').textContent = '❌ 你不是司機或管理員（請先在後台新增）';
       await auth.signOut();
       isLoggingIn = false;
       return;
     }
+
     currentUser = { uid, identifier: id, role, loginTime: Date.now() };
     isAdmin = (role === 'admin');
-    isSuperAdmin = SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === id.toLowerCase());
+    isSuperAdmin = isSuper;
+
     await db.ref('users/' + uid).set({ identifier: id, role, super: isSuperAdmin, lastLogin: Date.now() });
     logLogin(uid, id, role);
+
     document.getElementById('login-view').style.display = 'none';
     document.getElementById('main-view').style.display = 'block';
-    if (isAdmin) {
-      document.getElementById('tab-admin').style.display = 'inline-block';
-      document.getElementById('tab-admin').textContent = isSuperAdmin ? '👑 超管後台' : '👑 總管後台';
-      const title = document.getElementById('admin-title');
-      if (title) title.textContent = isSuperAdmin ? '超管後台' : '總管後台';
-      const roleDisp = document.getElementById('my-role-display');
-      if (roleDisp) roleDisp.textContent = (isSuperAdmin ? '👑 超級管理員' : '👤 普通管理員') + '（' + id + '）';
-      if (isSuperAdmin) {
-        const sec = document.getElementById('admin-section-manage-admins');
-        if (sec) sec.style.display = 'block';
-        const tb = document.getElementById('tab-manage-admins');
-        if (tb) tb.style.display = 'block';
-        if (typeof loadAdminList === 'function') loadAdminList();
-      }
-    } else {
-      const roleDisp = document.getElementById('my-role-display');
-      if (roleDisp) roleDisp.textContent = '🚏 司機（' + id + '）';
-    }
+
+    applyUserRoleUI();
+
     showToast('✅ 登入成功：' + id);
     if (voiceEnabled && typeof speakCantonese === 'function') {
       speakCantonese(isSuperAdmin ? '超級管理員登入成功' : isAdmin ? '管理員登入成功' : '司機登入成功');
@@ -653,28 +720,26 @@ async function googleLogin() {
     const result = await auth.signInWithPopup(provider);
     const user = result.user;
     const email = user.email;
-    const role = await checkRole(email);
+    const { role, isSuper } = await checkRole(email);
+
     if (role !== 'admin') {
       showToast('❌ 此 Google 帳戶不是管理員');
       await auth.signOut();
       return;
     }
+
     currentUser = { uid: user.uid, identifier: email, role, loginTime: Date.now() };
     isAdmin = true;
-    isSuperAdmin = SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === email.toLowerCase());
+    isSuperAdmin = isSuper;
+
     await db.ref('users/' + user.uid).set({ identifier: email, email, role, super: isSuperAdmin, lastLogin: Date.now() });
     logLogin(user.uid, email, role);
+
     document.getElementById('login-view').style.display = 'none';
     document.getElementById('main-view').style.display = 'block';
-    document.getElementById('tab-admin').style.display = 'inline-block';
-    document.getElementById('tab-admin').textContent = isSuperAdmin ? '👑 超管後台' : '👑 總管後台';
-    if (isSuperAdmin) {
-      const sec = document.getElementById('admin-section-manage-admins');
-      if (sec) sec.style.display = 'block';
-      const tb = document.getElementById('tab-manage-admins');
-      if (tb) tb.style.display = 'block';
-      if (typeof loadAdminList === 'function') loadAdminList();
-    }
+
+    applyUserRoleUI();
+
     showToast('✅ Google 登入成功：' + email);
     initDriverPanel();
   } catch (e) {
@@ -692,23 +757,15 @@ window.addEventListener('load', () => {
       const snap = await db.ref('users/' + u.uid).once('value');
       const d = snap.val();
       if (d && d.identifier && !driverData.plate) {
-        const role = await checkRole(d.identifier);
+        const { role, isSuper } = await checkRole(d.identifier);
         currentUser = { uid: u.uid, identifier: d.identifier, role, loginTime: Date.now() };
         isAdmin = (role === 'admin');
-        isSuperAdmin = SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === d.identifier.toLowerCase());
+        isSuperAdmin = isSuper;
+
         document.getElementById('login-view').style.display = 'none';
         document.getElementById('main-view').style.display = 'block';
-        if (isAdmin) {
-          document.getElementById('tab-admin').style.display = 'inline-block';
-          document.getElementById('tab-admin').textContent = isSuperAdmin ? '👑 超管後台' : '👑 總管後台';
-          if (isSuperAdmin) {
-            const sec = document.getElementById('admin-section-manage-admins');
-            if (sec) sec.style.display = 'block';
-            const tb = document.getElementById('tab-manage-admins');
-            if (tb) tb.style.display = 'block';
-            if (typeof loadAdminList === 'function') loadAdminList();
-          }
-        }
+
+        applyUserRoleUI();
         initDriverPanel();
       }
     }
