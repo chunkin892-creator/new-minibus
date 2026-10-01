@@ -1,7 +1,7 @@
 /* ============================================================
- * bookings.js — 留位系統模組
+ * bookings.js — 留位系統模組（v2 完整修復）
  * 負責：班次認領、座位圖、循環線留位、留位審核、No-show 清理
- * 依賴：config.js、routes.js、voice.js
+ * 修復：滿座超訂、重複初始化、XSS、廣播一致性
  * ============================================================ */
 
 let claimsCache = {};
@@ -12,6 +12,7 @@ let bookingListenerRef = null;
 let loopListenerRef = null;
 const notifiedBookingIds = new Set();
 const notifiedLoopIds = new Set();
+let _bookingsInited = false;
 
 /* ---------- 工具 ---------- */
 function getToday() {
@@ -57,8 +58,8 @@ function renderShiftCard(tm) {
   const isOther = plate && !isMine;
   const cls = isMine ? 'mine' : isOther ? 'other' : '';
   let tag;
-  if (isMine) tag = '<span class="plate-tag mine">✅ 你認領中：' + plate + '</span>';
-  else if (isOther) tag = '<span class="plate-tag taken">🚐 已被 ' + plate + ' 認領</span>';
+  if (isMine) tag = '<span class="plate-tag mine">✅ 你認領中：' + esc(plate) + '</span>';
+  else if (isOther) tag = '<span class="plate-tag taken">🚐 已被 ' + esc(plate) + ' 認領</span>';
   else tag = '<span class="plate-tag">⚪ 未認領</span>';
   let btn = '';
   if (!driverData.plate) btn = '<button class="btn btn-secondary btn-sm" disabled style="width:100%">請先設車牌</button>';
@@ -153,9 +154,9 @@ function renderSeatView() {
   if (pending.length) {
     h += '<div style="background:rgba(251,191,36,.08);border-left:3px solid #fbbf24;padding:10px;border-radius:8px;margin-bottom:10px"><div style="font-size:14px;font-weight:700;color:#fbbf24">⏳ 有 ' + pending.length + ' 位待確認</div></div>';
     pending.forEach(b => {
-      h += '<div class="pending-item"><div class="name">' + b.passengerName + ' (' + (b.seats || 1) + '位)</div>';
-      h += '<div class="info">📞 ' + b.passengerPhone + '</div>';
-      if (b.pickupLocation) h += '<div class="info" style="color:#22c55e">📍 ' + b.pickupLocation + '</div>';
+      h += '<div class="pending-item"><div class="name">' + esc(b.passengerName) + ' (' + (b.seats || 1) + '位)</div>';
+      h += '<div class="info">📞 ' + esc(b.passengerPhone) + '</div>';
+      if (b.pickupLocation) h += '<div class="info" style="color:#22c55e">📍 ' + esc(b.pickupLocation) + '</div>';
       h += '<div class="actions">';
       h += '<button style="background:linear-gradient(135deg,#16a34a,#15803d)" onclick="confirmBooking(\'' + b.date + '\',\'' + b.id + '\')">✅ 確認</button>';
       h += '<button style="background:linear-gradient(135deg,#dc2626,#991b1b)" onclick="rejectBooking(\'' + b.date + '\',\'' + b.id + '\')">❌ 拒絕</button>';
@@ -166,7 +167,7 @@ function renderSeatView() {
   h += '<div class="seat-grid">';
   seats.forEach(s => {
     if (s.status === 'empty') h += '<div class="seat empty"><div class="num">' + s.num + '</div><div style="font-size:9px">空</div></div>';
-    else h += '<div class="seat taken"><div class="num">' + s.num + '</div><div class="nm">' + s.name + '</div></div>';
+    else h += '<div class="seat taken"><div class="num">' + s.num + '</div><div class="nm">' + esc(s.name) + '</div></div>';
   });
   h += '</div>';
   view.innerHTML = h;
@@ -191,9 +192,9 @@ function renderLoopBookings() {
     h += '<div style="font-size:13px;font-weight:700;color:#7dd3fc;margin-bottom:8px">⏳ 待確認（' + lp.length + '）</div>';
     lp.forEach(([id, x]) => {
       h += '<div class="loop-pending">';
-      h += '<div style="font-size:16px;font-weight:700;color:#fff">👤 ' + x.name + '</div>';
-      h += '<div style="font-size:13px;color:#a89b7a;margin-top:4px">📞 ' + x.phone + '</div>';
-      if (x.pickupLocation) h += '<div style="font-size:13px;color:#22c55e;margin-top:4px">📍 ' + x.pickupLocation + '</div>';
+      h += '<div style="font-size:16px;font-weight:700;color:#fff">👤 ' + esc(x.name) + '</div>';
+      h += '<div style="font-size:13px;color:#a89b7a;margin-top:4px">📞 ' + esc(x.phone) + '</div>';
+      if (x.pickupLocation) h += '<div style="font-size:13px;color:#22c55e;margin-top:4px">📍 ' + esc(x.pickupLocation) + '</div>';
       h += '<div style="display:flex;gap:6px;margin-top:10px">';
       h += '<button style="flex:1;padding:12px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700" onclick="confirmLoop(\'' + id + '\')">✅ 確認</button>';
       h += '<button style="flex:1;padding:12px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700" onclick="rejectLoop(\'' + id + '\')">❌ 拒絕</button>';
@@ -204,10 +205,10 @@ function renderLoopBookings() {
     h += '<div style="font-size:13px;font-weight:700;color:#86efac;margin:10px 0 8px">✅ 已確認（' + lr.length + '）</div>';
     lr.forEach(([id, x]) => {
       h += '<div class="loop-item">';
-      h += '<div style="font-size:15px;font-weight:700;color:#fff">👤 ' + x.name + '</div>';
-      h += '<div style="font-size:13px;color:#a89b7a;margin-top:4px">📞 ' + x.phone + '</div>';
-      if (x.pickupLocation) h += '<div style="font-size:13px;color:#22c55e;margin-top:4px">📍 ' + x.pickupLocation + '</div>';
-      if (x.confirmedBy) h += '<div style="font-size:13px;color:#ffd700;margin-top:4px;font-weight:700">🚐 車牌：' + x.confirmedBy + '</div>';
+      h += '<div style="font-size:15px;font-weight:700;color:#fff">👤 ' + esc(x.name) + '</div>';
+      h += '<div style="font-size:13px;color:#a89b7a;margin-top:4px">📞 ' + esc(x.phone) + '</div>';
+      if (x.pickupLocation) h += '<div style="font-size:13px;color:#22c55e;margin-top:4px">📍 ' + esc(x.pickupLocation) + '</div>';
+      if (x.confirmedBy) h += '<div style="font-size:13px;color:#ffd700;margin-top:4px;font-weight:700">🚐 車牌：' + esc(x.confirmedBy) + '</div>';
       h += '</div>';
     });
   }
@@ -241,7 +242,6 @@ function startBookingListener() {
       } else if (typeof showToast === 'function') {
         showToast('🔔 有 ' + newPending + ' 位乘客留位！');
       }
-      // 聲音 + 震動
       playAlertSound();
       if (voiceEnabled) speakCantonese('有 ' + newPending + ' 位乘客留位');
     }
@@ -276,7 +276,7 @@ function startBookingListener() {
   });
 }
 
-/* ---------- 通知聲音（📢 響聲） ---------- */
+/* ---------- 通知聲音 ---------- */
 function playAlertSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -298,15 +298,29 @@ function playAlertSound() {
 }
 
 /* ============================================================
- * 五、確認 / 拒絕留位（🔥 座位自動扣減）
+ * 五、確認 / 拒絕留位（座位自動扣減 + 滿座防護）
  * ============================================================ */
 async function confirmBooking(date, id) {
-  console.log('🔵 confirmBooking', date, id);
   if (!id || id === 'undefined') { showToast('❌ 無效嘅預訂 ID'); return; }
   try {
     const snap = await db.ref('booking/' + date + '/' + id).once('value');
     const b = snap.val();
     if (!b) { showToast('❌ 預訂唔存在'); return; }
+
+    /* 滿座檢查：用 booking_seats 嘅剩餘座位做 transaction */
+    const tm = b.time;
+    const hhmm = tm.replace(':', '');
+    const seatsRef = db.ref('booking_seats/' + date + '/' + hhmm + '/seats');
+    const seatsTx = await seatsRef.transaction(cur => {
+      const c = cur == null ? 16 : cur;
+      if (c - (b.seats || 1) < 0) return; // abort
+      return c - (b.seats || 1);
+    });
+    if (!seatsTx.committed) {
+      showToast('❌ 剩餘座位不足，無法確認');
+      return;
+    }
+
     await db.ref('booking/' + date + '/' + id).update({
       status: 'reserved',
       confirmedAt: Date.now(),
@@ -334,6 +348,14 @@ async function rejectBooking(date, id) {
     await db.ref('booking/' + date + '/' + id).update({ status: 'rejected', rejectedAt: Date.now() });
     if (b.status === 'reserved' && b.confirmedBy) {
       await db.ref('van/active_buses/' + b.confirmedBy + '/passengerCount').transaction(c => Math.max(0, (c || 0) - (b.seats || 1)));
+    }
+    // 回退座位
+    if (b.status === 'reserved' && b.time) {
+      const hhmm = b.time.replace(':', '');
+      await db.ref('booking_seats/' + date + '/' + hhmm + '/seats').transaction(c => {
+        const cur = c == null ? 16 : c;
+        return Math.min(16, cur + (b.seats || 1));
+      });
     }
     showToast('已拒絕');
   } catch (e) { showToast('❌ ' + e.message); }
@@ -385,18 +407,34 @@ async function autoCleanNoShow() {
         if (b.confirmedBy) {
           await db.ref('van/active_buses/' + b.confirmedBy + '/passengerCount').transaction(c => Math.max(0, (c || 0) - (b.seats || 1)));
         }
-        console.log('⏰ No-show:', id, b.passengerName);
+        const hhmm = b.time.replace(':', '');
+        await db.ref('booking_seats/' + t + '/' + hhmm + '/seats').transaction(c => {
+          const cur = c == null ? 16 : c;
+          return Math.min(16, cur + (b.seats || 1));
+        });
       }
     }
   } catch (e) { console.warn('自動清理失敗:', e); }
 }
 
 /* ============================================================
- * 七、初始化留位系統
+ * 七、初始化留位系統（只初始化一次）
  * ============================================================ */
 function initBookings() {
+  if (_bookingsInited) return;
+  _bookingsInited = true;
   loadShiftClaims();
   startBookingListener();
   setInterval(autoCleanNoShow, 5 * 60 * 1000);
   setTimeout(autoCleanNoShow, 3000);
 }
+
+/* ---------- 全域暴露 ---------- */
+window.confirmBooking = confirmBooking;
+window.rejectBooking = rejectBooking;
+window.confirmLoop = confirmLoop;
+window.rejectLoop = rejectLoop;
+window.claimShift = claimShift;
+window.unclaimShift = unclaimShift;
+window.renderSeatView = renderSeatView;
+window.renderLoopBookings = renderLoopBookings;
