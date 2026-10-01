@@ -1,7 +1,5 @@
 /* ============================================================
- * bookings.js — 留位系統模組（v2 完整修復）
- * 負責：班次認領、座位圖、循環線留位、留位審核、No-show 清理
- * 修復：滿座超訂、重複初始化、XSS、廣播一致性
+ * bookings.js — 留位系統模組（高併發安全防護版）
  * ============================================================ */
 
 let claimsCache = {};
@@ -14,7 +12,6 @@ const notifiedBookingIds = new Set();
 const notifiedLoopIds = new Set();
 let _bookingsInited = false;
 
-/* ---------- 工具 ---------- */
 function getToday() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -30,9 +27,7 @@ function getShiftTimestamp(date, time) {
 }
 function isPastShift(tm) { return Date.now() > getShiftTimestamp(getToday(), tm); }
 
-/* ============================================================
- * 一、班次認領
- * ============================================================ */
+/* ---------- 班次認領 ---------- */
 function loadShiftClaims() {
   if (shiftClaimRef) { try { shiftClaimRef.off(); } catch (e) {} }
   shiftClaimRef = db.ref('booking_seats/' + getToday());
@@ -88,7 +83,7 @@ async function claimShift(tm) {
     });
     if (result.committed) {
       showToast('✅ 已認領 ' + tm);
-      if (voiceEnabled) speakCantonese('已認領 ' + tm + ' 班次');
+      if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese('已認領 ' + tm + ' 班次');
     } else {
       const cur = result.snapshot.val();
       showToast('❌ 已被 ' + (cur && cur.plate ? cur.plate : '其他司機') + ' 認領');
@@ -100,16 +95,16 @@ async function unclaimShift(tm) {
   if (!confirm('確定取消認領 ' + tm + '？')) return;
   try {
     const hhmm = tm.replace(':', '');
-    const cur = await db.ref('booking_seats/' + getToday() + '/' + hhmm + '/plate').once('value');
-    if (cur.val() !== driverData.plate) { showToast('❌ 車牌不符'); return; }
-    await db.ref('booking_seats/' + getToday() + '/' + hhmm + '/plate').remove();
+    const ref = db.ref('booking_seats/' + getToday() + '/' + hhmm);
+    const snap = await ref.once('value');
+    const val = snap.val();
+    if (!val || val.plate !== driverData.plate) { showToast('❌ 車牌不符或未認領'); return; }
+    await ref.remove();
     showToast('已取消認領');
   } catch (e) { showToast('❌ ' + e.message); }
 }
 
-/* ============================================================
- * 二、座位圖
- * ============================================================ */
+/* ---------- 座位圖 ---------- */
 function renderSeatView() {
   const sel = document.getElementById('seat-shift-select');
   const view = document.getElementById('seat-view');
@@ -134,7 +129,7 @@ function renderSeatView() {
   const confirmed = items.filter(b => b.status === 'reserved' || b.status === 'boarded');
   const pending = items.filter(b => b.status === 'pending');
   const totalBooked = confirmed.reduce((s, b) => s + (b.seats || 1), 0);
-  const remaining = 16 - totalBooked;
+  const remaining = Math.max(0, 16 - totalBooked);
   let seats = [];
   let idx = 1;
   confirmed.forEach(b => {
@@ -173,9 +168,7 @@ function renderSeatView() {
   view.innerHTML = h;
 }
 
-/* ============================================================
- * 三、循環線留位
- * ============================================================ */
+/* ---------- 循環線留位 ---------- */
 function renderLoopBookings() {
   const c = document.getElementById('loop-bookings');
   if (!c) return;
@@ -215,9 +208,6 @@ function renderLoopBookings() {
   c.innerHTML = h;
 }
 
-/* ============================================================
- * 四、留位監聽
- * ============================================================ */
 function startBookingListener() {
   const t = getToday();
   if (bookingListenerRef) { try { bookingListenerRef.off(); } catch (e) {} }
@@ -237,13 +227,9 @@ function startBookingListener() {
     });
     if (newPending > 0) {
       newIds.forEach(k => notifiedBookingIds.add('pending_' + k));
-      if (typeof showBookingNotif === 'function') {
-        showBookingNotif('🔔 有 ' + newPending + ' 位乘客留位！', newPending);
-      } else if (typeof showToast === 'function') {
-        showToast('🔔 有 ' + newPending + ' 位乘客留位！');
-      }
+      showToast('🔔 有 ' + newPending + ' 位乘客留位！');
       playAlertSound();
-      if (voiceEnabled) speakCantonese('有 ' + newPending + ' 位乘客留位');
+      if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese('有 ' + newPending + ' 位乘客留位');
     }
     bookingsCache = ab;
     renderSeatView();
@@ -263,23 +249,18 @@ function startBookingListener() {
     });
     if (newLoopPending > 0) {
       newIds.forEach(k => notifiedLoopIds.add(k));
-      if (typeof showBookingNotif === 'function') {
-        showBookingNotif('🔄 有 ' + newLoopPending + ' 位循環線留位！', newLoopPending);
-      } else if (typeof showToast === 'function') {
-        showToast('🔄 有 ' + newLoopPending + ' 位循環線留位！');
-      }
+      showToast('🔄 有 ' + newLoopPending + ' 位循環線留位！');
       playAlertSound();
-      if (voiceEnabled) speakCantonese('有 ' + newLoopPending + ' 位循環線留位');
+      if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese('有 ' + newLoopPending + ' 位循環線留位');
     }
     loopCache = ab;
     renderLoopBookings();
   });
 }
 
-/* ---------- 通知聲音 ---------- */
 function playAlertSound() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = getAudioContext();
     const beep = (freq, delay) => {
       const o = ctx.createOscillator();
       const g = ctx.createGain();
@@ -297,23 +278,20 @@ function playAlertSound() {
   try { if (navigator.vibrate) navigator.vibrate([300, 100, 300]); } catch (e) {}
 }
 
-/* ============================================================
- * 五、確認 / 拒絕留位（座位自動扣減 + 滿座防護）
- * ============================================================ */
 async function confirmBooking(date, id) {
-  if (!id || id === 'undefined') { showToast('❌ 無效嘅預訂 ID'); return; }
+  if (!id || id === 'undefined') { showToast('❌ 無效的預訂 ID'); return; }
   try {
-    const snap = await db.ref('booking/' + date + '/' + id).once('value');
+    const bRef = db.ref('booking/' + date + '/' + id);
+    const snap = await bRef.once('value');
     const b = snap.val();
-    if (!b) { showToast('❌ 預訂唔存在'); return; }
+    if (!b || b.status !== 'pending') { showToast('❌ 預訂不存在或已被處理'); return; }
 
-    /* 滿座檢查：用 booking_seats 嘅剩餘座位做 transaction */
     const tm = b.time;
     const hhmm = tm.replace(':', '');
     const seatsRef = db.ref('booking_seats/' + date + '/' + hhmm + '/seats');
     const seatsTx = await seatsRef.transaction(cur => {
       const c = cur == null ? 16 : cur;
-      if (c - (b.seats || 1) < 0) return; // abort
+      if (c - (b.seats || 1) < 0) return;
       return c - (b.seats || 1);
     });
     if (!seatsTx.committed) {
@@ -321,20 +299,18 @@ async function confirmBooking(date, id) {
       return;
     }
 
-    await db.ref('booking/' + date + '/' + id).update({
+    await bRef.update({
       status: 'reserved',
       confirmedAt: Date.now(),
       confirmedBy: driverData.plate || currentUser.identifier
     });
     if (driverData.plate) {
-      await db.ref('van/active_buses/' + driverData.plate + '/passengerCount').transaction(c => {
-        return (c || 0) + (b.seats || 1);
-      });
+      await db.ref('van/active_buses/' + driverData.plate + '/passengerCount').transaction(c => (c || 0) + (b.seats || 1));
     }
     showToast('✅ 已確認留位，座位 +' + (b.seats || 1));
-    if (voiceEnabled) speakCantonese(VOICE_TEXTS.bookingConfirmed);
+    if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese(VOICE_TEXTS.bookingConfirmed);
   } catch (e) {
-    console.error('❌ confirmBooking:', e);
+    console.error('confirmBooking 失敗:', e);
     showToast('❌ 確認失敗：' + e.message);
   }
 }
@@ -342,28 +318,38 @@ async function confirmBooking(date, id) {
 async function rejectBooking(date, id) {
   if (!confirm('確定拒絕？')) return;
   try {
-    const snap = await db.ref('booking/' + date + '/' + id).once('value');
+    const bRef = db.ref('booking/' + date + '/' + id);
+    const snap = await bRef.once('value');
     const b = snap.val();
     if (!b) return;
-    await db.ref('booking/' + date + '/' + id).update({ status: 'rejected', rejectedAt: Date.now() });
-    if (b.status === 'reserved' && b.confirmedBy) {
-      await db.ref('van/active_buses/' + b.confirmedBy + '/passengerCount').transaction(c => Math.max(0, (c || 0) - (b.seats || 1)));
+
+    const wasReserved = (b.status === 'reserved');
+    await bRef.update({ status: 'rejected', rejectedAt: Date.now() });
+
+    if (wasReserved) {
+      if (b.confirmedBy) {
+        await db.ref('van/active_buses/' + b.confirmedBy + '/passengerCount').transaction(c => Math.max(0, (c || 0) - (b.seats || 1)));
+      }
+      if (b.time) {
+        const hhmm = b.time.replace(':', '');
+        await db.ref('booking_seats/' + date + '/' + hhmm + '/seats').transaction(c => {
+          const cur = c == null ? 16 : c;
+          return Math.min(16, cur + (b.seats || 1));
+        });
+      }
     }
-    // 回退座位
-    if (b.status === 'reserved' && b.time) {
-      const hhmm = b.time.replace(':', '');
-      await db.ref('booking_seats/' + date + '/' + hhmm + '/seats').transaction(c => {
-        const cur = c == null ? 16 : c;
-        return Math.min(16, cur + (b.seats || 1));
-      });
-    }
-    showToast('已拒絕');
+    showToast('已拒絕留位');
   } catch (e) { showToast('❌ ' + e.message); }
 }
 
 async function confirmLoop(id) {
   try {
-    await db.ref('booking_loop/' + getToday() + '/' + id).update({
+    const ref = db.ref('booking_loop/' + getToday() + '/' + id);
+    const snap = await ref.once('value');
+    const val = snap.val();
+    if (!val || val.status !== 'pending') { showToast('❌ 留位狀態已改變'); return; }
+
+    await ref.update({
       status: 'reserved',
       confirmedAt: Date.now(),
       confirmedBy: driverData.plate || currentUser.identifier
@@ -372,27 +358,27 @@ async function confirmLoop(id) {
       await db.ref('van/active_buses/' + driverData.plate + '/passengerCount').transaction(c => (c || 0) + 1);
     }
     showToast('✅ 循環線已確認，座位 +1');
-    if (voiceEnabled) speakCantonese('循環線留位已確認');
+    if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese('循環線留位已確認');
   } catch (e) { showToast('❌ ' + e.message); }
 }
 
 async function rejectLoop(id) {
   if (!confirm('確定拒絕？')) return;
   try {
-    const snap = await db.ref('booking_loop/' + getToday() + '/' + id).once('value');
+    const ref = db.ref('booking_loop/' + getToday() + '/' + id);
+    const snap = await ref.once('value');
     const b = snap.val();
     if (!b) return;
-    await db.ref('booking_loop/' + getToday() + '/' + id).update({ status: 'rejected', rejectedAt: Date.now() });
-    if (b.status === 'reserved' && b.confirmedBy) {
+
+    const wasReserved = (b.status === 'reserved');
+    await ref.update({ status: 'rejected', rejectedAt: Date.now() });
+    if (wasReserved && b.confirmedBy) {
       await db.ref('van/active_buses/' + b.confirmedBy + '/passengerCount').transaction(c => Math.max(0, (c || 0) - 1));
     }
     showToast('已拒絕');
   } catch (e) { showToast('❌ ' + e.message); }
 }
 
-/* ============================================================
- * 六、自動 No-show 清理（每 5 分鐘）
- * ============================================================ */
 async function autoCleanNoShow() {
   try {
     const t = getToday();
@@ -417,9 +403,6 @@ async function autoCleanNoShow() {
   } catch (e) { console.warn('自動清理失敗:', e); }
 }
 
-/* ============================================================
- * 七、初始化留位系統（只初始化一次）
- * ============================================================ */
 function initBookings() {
   if (_bookingsInited) return;
   _bookingsInited = true;
@@ -429,7 +412,6 @@ function initBookings() {
   setTimeout(autoCleanNoShow, 3000);
 }
 
-/* ---------- 全域暴露 ---------- */
 window.confirmBooking = confirmBooking;
 window.rejectBooking = rejectBooking;
 window.confirmLoop = confirmLoop;

@@ -1,16 +1,34 @@
 /* ============================================================
- * app.js — 主程式（v2 完整修復）
- * 負責：Firebase 初始化、角色檢查、登入、Tab 切換、司機面板、事件綁定
- * 修復：車牌綁定、司機按鈕、後台初始化、登入記錄、重複初始化、
- *       超管判斷、踢出監聽、公告監聽、XSS
+ * app.js — 主程式（完整修復與防護增強版）
  * ============================================================ */
+
+/* ---------- 全局音訊單例與基礎工具 ---------- */
+let globalAudioCtx = null;
+function getAudioContext() {
+  if (!globalAudioCtx || globalAudioCtx.state === 'closed') {
+    globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (globalAudioCtx.state === 'suspended') {
+    globalAudioCtx.resume();
+  }
+  return globalAudioCtx;
+}
+
+function safeKey(str) {
+  if (!str) return 'unknown';
+  return String(str).replace(/[.#$\[\]\/]/g, '_');
+}
+window.safeKey = safeKey;
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+window.esc = esc;
 
 /* ---------- 全局狀態 ---------- */
 let currentUser = { uid: null, identifier: null, role: 'passenger', loginTime: null };
 let isSuperAdmin = false, isAdmin = false;
 let driverData = { mode: 'busy', direction: 0, stationIndex: 0, passengerCount: 0, isActive: false, plate: null, carSeats: 16, isFull: false };
-let currentBusId = null;
-let busListRef = null;
 let isLoggingIn = false;
 let kickListenRef = null;
 let announceListenRef = null;
@@ -21,9 +39,8 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-/* ---------- 工具 ---------- */
-function showToast(msg, duration) {
-  if (!duration) duration = 3000;
+/* ---------- 界面提示與視圖控制 ---------- */
+function showToast(msg, duration = 3000) {
   const t = document.getElementById('toast');
   if (!t) { alert(msg); return; }
   t.textContent = msg;
@@ -31,12 +48,7 @@ function showToast(msg, duration) {
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove('show'), duration);
 }
-
-function showView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-}
+window.showToast = showToast;
 
 function isBanned(uid) {
   if (!uid) return Promise.resolve(false);
@@ -44,6 +56,7 @@ function isBanned(uid) {
     .then(s => !!s.val())
     .catch(() => false);
 }
+window.isBanned = isBanned;
 
 function getSavedPlate(identifier) {
   if (!identifier) return null;
@@ -64,21 +77,24 @@ function savePlate(identifier, plate) {
 function getRoute() { return getRouteByMode(driverData.mode, driverData.direction); }
 function getCoords() { return getCoordsByMode(driverData.mode, driverData.direction); }
 
-/* ---------- 播放語音（放大音量） ---------- */
-function playBoostedAudio(base64, boost) {
+/* ---------- 播放語音（防止音訊上下文溢出） ---------- */
+function playBoostedAudio(base64, boost = 7) {
   if (!base64) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-    ctx.decodeAudioData(bytes.buffer, buf => {
+    const ctx = getAudioContext();
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    ctx.decodeAudioData(bytes.buffer.slice(0), buf => {
       const src = ctx.createBufferSource();
       src.buffer = buf;
       const gain = ctx.createGain();
-      gain.gain.value = boost || 7;
+      gain.gain.value = boost;
       src.connect(gain);
       gain.connect(ctx.destination);
       src.start(0);
     }, err => {
+      console.warn('decodeAudioData 錯誤，使用音訊元素播放:', err);
       const audio = new Audio('data:audio/webm;base64,' + base64);
       audio.volume = 1.0;
       audio.play().catch(() => {});
@@ -91,86 +107,88 @@ function playBoostedAudio(base64, boost) {
 }
 window.playBoostedAudio = playBoostedAudio;
 
-/* ---------- 長按錄音按鈕 ---------- */
+/* ---------- 錄音控制器管理 ---------- */
+const RecorderManager = {
+  instances: {},
+  create: function(id, onSend) {
+    if (this.instances[id]) return this.instances[id];
+    let mr = null, stream = null, chunks = [], timer = null, sec = 0, isRec = false;
+    const self = {
+      start: function() {
+        if (isRec) return;
+        isRec = true;
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(s => {
+          stream = s;
+          try {
+            mr = new MediaRecorder(s, { audioBitsPerSecond: CONFIG.VOICE_BITRATE || 24000, mimeType: 'audio/webm;codecs=opus' });
+          } catch (e) {
+            mr = new MediaRecorder(s, { audioBitsPerSecond: CONFIG.VOICE_BITRATE || 24000 });
+          }
+          chunks = [];
+          mr.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+          mr.start();
+          sec = 0;
+          const st = document.getElementById(id + '-rec-status'); if (st) st.style.display = 'flex';
+          const tm = document.getElementById(id + '-rec-time'); if (tm) tm.textContent = '0';
+          timer = setInterval(() => {
+            sec++;
+            if (tm) tm.textContent = sec;
+            if (sec >= (CONFIG.RECORD_MAX_SECONDS || 30)) self.stop();
+          }, 1000);
+        }).catch(err => {
+          showToast('無法開啟咪高峰：' + err.message);
+          isRec = false;
+        });
+      },
+      stop: function() {
+        if (!isRec) return;
+        isRec = false;
+        if (timer) { clearInterval(timer); timer = null; }
+        if (mr && mr.state === 'recording') {
+          mr.onstop = () => {
+            const blob = new Blob(chunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.onload = () => { if (onSend) onSend(reader.result.split(',')[1]); };
+            reader.readAsDataURL(blob);
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+          };
+          mr.stop();
+        }
+        const st = document.getElementById(id + '-rec-status'); if (st) st.style.display = 'none';
+      },
+      cancel: function() {
+        if (!isRec) return;
+        isRec = false;
+        if (timer) { clearInterval(timer); timer = null; }
+        if (mr && mr.state === 'recording') mr.stop();
+        if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+        const st = document.getElementById(id + '-rec-status'); if (st) st.style.display = 'none';
+      },
+      isRecording: function() { return isRec; }
+    };
+    this.instances[id] = self;
+    return self;
+  },
+  get: function(id) { return this.instances[id]; }
+};
+window.RecorderManager = RecorderManager;
+
 function setupRecordButton(btnId, timerId, callback) {
   const btn = document.getElementById(btnId);
-  if (!btn || btn._recBound) return;
-  btn._recBound = true;
-  const timer = document.getElementById(timerId);
-  let longPress = null, isRecording = false, mediaRecorder = null, mediaStream = null, audioChunks = [], recordingTimer = null, recSeconds = 0;
+  if (!btn || btn._bound) return;
+  btn._bound = true;
+  const prefix = btnId.replace(/^btn-/, '').replace(/-record$/, '');
+  const rec = RecorderManager.create(prefix, callback);
 
-  function startRec(e) {
-    e.preventDefault();
-    if (isRecording) return;
-    isRecording = true;
-    longPress = setTimeout(() => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        showToast('不支援錄音'); isRecording = false; return;
-      }
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-          mediaStream = stream;
-          try {
-            mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: CONFIG.VOICE_BITRATE, mimeType: 'audio/webm;codecs=opus' });
-          } catch (e) {
-            mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: CONFIG.VOICE_BITRATE });
-          }
-          audioChunks = [];
-          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-          mediaRecorder.onstop = () => {
-            const blob = new Blob(audioChunks, { type: 'audio/webm' });
-            const reader = new FileReader();
-            reader.onload = () => {
-              const base64 = reader.result.split(',')[1];
-              if (callback) callback(base64);
-              showToast('錄音完成');
-            };
-            reader.readAsDataURL(blob);
-            btn.classList.remove('recording');
-            if (timer) { timer.style.display = 'none'; timer.textContent = '0s'; }
-            clearInterval(recordingTimer);
-            recordingTimer = null;
-          };
-          mediaRecorder.start();
-          btn.classList.add('recording');
-          recSeconds = 0;
-          if (timer) { timer.style.display = 'block'; timer.textContent = '0s'; }
-          recordingTimer = setInterval(() => {
-            recSeconds++;
-            if (timer) timer.textContent = recSeconds + 's';
-            if (recSeconds >= CONFIG.RECORD_MAX_SECONDS) {
-              if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
-              }
-              isRecording = false;
-              clearInterval(recordingTimer);
-              recordingTimer = null;
-              btn.classList.remove('recording');
-              if (timer) { timer.style.display = 'none'; }
-              showToast('錄音已達上限 ' + CONFIG.RECORD_MAX_SECONDS + ' 秒');
-            }
-          }, 1000);
-        })
-        .catch(() => { showToast('無法開啟咪高峰'); isRecording = false; btn.classList.remove('recording'); });
-    }, 500);
-  }
-  function stopRec(e) {
-    if (e) e.preventDefault();
-    clearTimeout(longPress);
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-      if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
-    }
-    isRecording = false;
-  }
-  btn.addEventListener('touchstart', startRec, { passive: false });
-  btn.addEventListener('touchend', stopRec, { passive: false });
-  btn.addEventListener('touchcancel', stopRec, { passive: false });
-  btn.addEventListener('mousedown', startRec);
-  btn.addEventListener('mouseup', stopRec);
-  btn.addEventListener('mouseleave', stopRec);
+  btn.addEventListener('click', () => {
+    if (rec.isRecording()) return;
+    rec.start();
+    const ctrl = document.getElementById(prefix + '-record-controls');
+    if (ctrl) ctrl.style.display = 'flex';
+    btn.style.display = 'none';
+  });
 }
+window.setupRecordButton = setupRecordButton;
 
 /* ---------- 角色檢查 ---------- */
 async function checkRole(identifier) {
@@ -179,31 +197,24 @@ async function checkRole(identifier) {
     const adminSnap = await db.ref('admins').once('value');
     adminSnap.forEach(child => {
       const data = child.val();
-      if (data.identifier === identifier || data.email === identifier || data.phone === identifier || data.uid === identifier) role = 'admin';
+      if (data && (data.identifier === identifier || data.email === identifier || data.phone === identifier || data.uid === identifier)) {
+        role = 'admin';
+      }
     });
     if (role === 'passenger') {
       const driverSnap = await db.ref('drivers').once('value');
       driverSnap.forEach(child => {
         const data = child.val();
-        if (data.identifier === identifier || data.email === identifier || data.phone === identifier || data.uid === identifier) role = 'driver';
+        if (data && (data.identifier === identifier || data.email === identifier || data.phone === identifier || data.uid === identifier)) {
+          role = 'driver';
+        }
       });
     }
   } catch (e) { console.warn('檢查角色失敗:', e); }
   return role;
 }
 
-/* ---------- 安全點擊 ---------- */
-function safeClick(el, cb) {
-  if (!el) return;
-  el.addEventListener('click', function (e) {
-    if (this.disabled) return;
-    this.disabled = true;
-    try { cb(e); } catch (err) { console.error(err); showToast('操作錯誤'); }
-    setTimeout(() => { this.disabled = false; }, 300);
-  });
-}
-
-/* ---------- 設定車牌（核心修復） ---------- */
+/* ---------- 車牌設定 ---------- */
 function bindSetPlateButton() {
   const btn = document.getElementById('btn-set-plate');
   const input = document.getElementById('driver-plate-input');
@@ -223,11 +234,10 @@ function bindSetPlateButton() {
     if (typeof loadShiftClaims === 'function') loadShiftClaims();
     if (typeof initWalkieTalkie === 'function') initWalkieTalkie();
     showToast('✅ 車牌已設定：' + plate);
-    if (voiceEnabled) speakCantonese(VOICE_TEXTS.carPlateSet);
+    if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese(VOICE_TEXTS.carPlateSet);
   });
 }
 
-/* ---------- 登入記錄 ---------- */
 function logLogin(uid, identifier, role) {
   try {
     let device = '未知', os = '未知', browser = '未知';
@@ -248,7 +258,7 @@ function logLogin(uid, identifier, role) {
   } catch (e) { console.warn('logLogin 失敗:', e); }
 }
 
-/* ---------- 司機控制 ---------- */
+/* ---------- 司機乘客控制 ---------- */
 function addPass() {
   if (!driverData.isActive) { showToast('請先開始當值'); return; }
   driverData.passengerCount++;
@@ -281,7 +291,7 @@ function switchDir() {
   updateDriverDB();
   renderDriverRouteStrip();
   showToast('🔄 已調頭，往' + (driverData.direction === 0 ? '元朗' : '大棠'));
-  if (voiceEnabled) speakCantonese(VOICE_TEXTS.turnAround);
+  if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese(VOICE_TEXTS.turnAround);
 }
 
 function toggleMode() {
@@ -298,7 +308,7 @@ function toggleMode() {
   updateDriverDB();
   renderDriverRouteStrip();
   showToast('🔄 已切換至 ' + name);
-  if (voiceEnabled) speakCantonese(VOICE_TEXTS.switchedTo + name);
+  if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese(VOICE_TEXTS.switchedTo + name);
 }
 
 function toggleCarSeats() {
@@ -311,9 +321,6 @@ function toggleCarSeats() {
   showToast('🚐 座位數：' + driverData.carSeats);
 }
 
-/* ============================================================
- * 司機 UI
- * ============================================================ */
 function updateDriverUI() {
   const route = getRoute();
   const idx = driverData.stationIndex || 0;
@@ -386,10 +393,10 @@ function updateDriverDB() {
   updateDriverUI();
 }
 
-/* ---------- 開始當值 ---------- */
+/* ---------- 開始與停止當值 ---------- */
 function startDuty() {
   if (!driverData.plate) { showToast('請先設定車牌'); return; }
-  if (!navigator.geolocation) showToast('瀏覽器不支援 GPS，但你仍然可以手動操作');
+  if (!navigator.geolocation) showToast('瀏覽器不支援 GPS，但仍可手動操作');
   gpsFirstFix = false;
   if (gpsRetryTimer) { clearTimeout(gpsRetryTimer); gpsRetryTimer = null; }
   voiceLock = false;
@@ -404,8 +411,8 @@ function startDuty() {
   lastReportedIndex = -1;
   lastDriverScrollIndex = -1;
   updateDriverDB();
-  showToast('🟢 已開始當值' + (navigator.geolocation ? '' : '（GPS 不支援，請手動操作）'));
-  if (voiceEnabled) speakCantonese(VOICE_TEXTS.startDuty);
+  showToast('🟢 已開始當值');
+  if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese(VOICE_TEXTS.startDuty);
   if (navigator.geolocation) {
     setTimeout(() => { if (driverData.isActive) startGpsWatch(); }, 1500);
   }
@@ -415,7 +422,6 @@ function startDuty() {
   if (stg) stg.style.display = 'block';
 }
 
-/* ---------- 停止當值 ---------- */
 function stopDuty() {
   if (!confirm('確定停止當值？')) return;
   driverData.isActive = false;
@@ -429,12 +435,11 @@ function stopDuty() {
   if (sg) sg.style.display = 'block';
   if (stg) stg.style.display = 'none';
   showToast('🔴 已停止當值');
-  if (voiceEnabled) speakCantonese(VOICE_TEXTS.stopDuty);
+  if (voiceEnabled && typeof speakCantonese === 'function') speakCantonese(VOICE_TEXTS.stopDuty);
 }
 window.startDuty = startDuty;
 window.stopDuty = stopDuty;
 
-/* ---------- 司機面板初始化 ---------- */
 function initDriverPanel() {
   const savedPlate = getSavedPlate(currentUser.identifier);
   if (savedPlate && !driverData.plate) {
@@ -456,7 +461,6 @@ function initDriverPanel() {
   if (stg) stg.style.display = driverData.isActive ? 'block' : 'none';
 }
 
-/* ---------- 司機訊息監聽 ---------- */
 function startDriverMsgListener() {
   if (!driverData.plate) return;
   if (window._driverMsgRef) { try { window._driverMsgRef.off(); } catch (e) {} }
@@ -489,7 +493,7 @@ function startDriverMsgListener() {
         btn.addEventListener('click', () => playBoostedAudio(msg.audio, 7));
         div.appendChild(btn);
         const span = document.createElement('span');
-        span.textContent = '🎤 語音訊息';
+        span.textContent = ' 🎤 語音訊息';
         div.appendChild(span);
       } else {
         const txt = document.createTextNode((msg.senderIdentifier || '') + ': ' + (msg.text || '(訊息)'));
@@ -497,7 +501,7 @@ function startDriverMsgListener() {
       }
       const delBtn = document.createElement('button');
       delBtn.className = 'btn btn-secondary';
-      delBtn.style.cssText = 'width:auto;padding:4px 10px;font-size:13px;';
+      delBtn.style.cssText = 'width:auto;padding:4px 10px;font-size:13px;margin-left:auto;';
       delBtn.textContent = '🗑️';
       delBtn.addEventListener('click', () => {
         if (confirm('確定刪除此訊息？')) db.ref('van/messages/' + item.key).remove().then(() => showToast('已刪除'));
@@ -505,7 +509,6 @@ function startDriverMsgListener() {
       div.appendChild(delBtn);
       el.appendChild(div);
     });
-    // 通知氣泡
     if (items.length > 0 && items[0].msg.timestamp > (window._lastDriverMsgTs || 0) && window._lastDriverMsgTs) {
       const m = items[0].msg;
       if (typeof showMsgNotification === 'function') {
@@ -516,7 +519,6 @@ function startDriverMsgListener() {
   });
 }
 
-/* ---------- 公告監聽（司機端） ---------- */
 function startAnnounceListener() {
   if (announceListenRef) { try { announceListenRef.off(); } catch (e) {} }
   announceListenRef = db.ref('van/announcements').orderByChild('timestamp').limitToLast(1);
@@ -525,7 +527,6 @@ function startAnnounceListener() {
       const ann = child.val();
       if (!ann) return;
       if (window._lastAnnounceTs && ann.timestamp > window._lastAnnounceTs) {
-        const body = ann.audio ? '🎤 [語音公告]' : esc(ann.text || '');
         if (typeof showMsgNotification === 'function') {
           showMsgNotification(ann.audio ? 'audio' : 'text', ann.publisher || '管理員', ann.text || '語音公告');
         }
@@ -535,7 +536,6 @@ function startAnnounceListener() {
   });
 }
 
-/* ---------- 廣播監聽（司機端） ---------- */
 function startBroadcastListener() {
   if (broadcastListenRef) { try { broadcastListenRef.off(); } catch (e) {} }
   broadcastListenRef = db.ref('van/messages').orderByChild('timestamp').limitToLast(20);
@@ -554,8 +554,8 @@ function startBroadcastListener() {
   });
 }
 
-/* ---------- 踢出監聽 ---------- */
 function startKickListener() {
+  if (!currentUser.identifier) return;
   if (kickListenRef) { try { kickListenRef.off(); } catch (e) {} }
   kickListenRef = db.ref('van/kick/' + safeKey(currentUser.identifier));
   kickListenRef.on('value', snap => {
@@ -573,9 +573,6 @@ function startKickListener() {
   });
 }
 
-/* ============================================================
- * Tab 切換
- * ============================================================ */
 function switchTab(tabName) {
   ['duty','claim','seats','msg','walkie','admin'].forEach(k => {
     const p = document.getElementById('tab-' + k);
@@ -591,15 +588,12 @@ function switchTab(tabName) {
   }
   if (tabName === 'admin') {
     if (typeof loadAdminPanel === 'function') loadAdminPanel();
-    updateAdminBookingStats();
-    if (isSuperAdmin) loadAdminList();
+    if (typeof updateAdminBookingStats === 'function') updateAdminBookingStats();
+    if (isSuperAdmin && typeof loadAdminList === 'function') loadAdminList();
   }
 }
 window.switchTab = switchTab;
 
-/* ============================================================
- * 登入
- * ============================================================ */
 async function doLogin() {
   const id = document.getElementById('login-id').value.trim();
   if (!id) { document.getElementById('login-err').textContent = '請輸入電話或電郵'; return; }
@@ -618,7 +612,7 @@ async function doLogin() {
     }
     currentUser = { uid, identifier: id, role, loginTime: Date.now() };
     isAdmin = (role === 'admin');
-    isSuperAdmin = isSuperAdminEmail(id);
+    isSuperAdmin = SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === id.toLowerCase());
     await db.ref('users/' + uid).set({ identifier: id, role, super: isSuperAdmin, lastLogin: Date.now() });
     logLogin(uid, id, role);
     document.getElementById('login-view').style.display = 'none';
@@ -635,14 +629,16 @@ async function doLogin() {
         if (sec) sec.style.display = 'block';
         const tb = document.getElementById('tab-manage-admins');
         if (tb) tb.style.display = 'block';
-        loadAdminList();
+        if (typeof loadAdminList === 'function') loadAdminList();
       }
     } else {
       const roleDisp = document.getElementById('my-role-display');
       if (roleDisp) roleDisp.textContent = '🚏 司機（' + id + '）';
     }
     showToast('✅ 登入成功：' + id);
-    if (voiceEnabled) speakCantonese(isSuperAdmin ? '超級管理員登入成功' : isAdmin ? '管理員登入成功' : '司機登入成功');
+    if (voiceEnabled && typeof speakCantonese === 'function') {
+      speakCantonese(isSuperAdmin ? '超級管理員登入成功' : isAdmin ? '管理員登入成功' : '司機登入成功');
+    }
     initDriverPanel();
   } catch (e) {
     document.getElementById('login-err').textContent = '登入失敗：' + e.message;
@@ -665,7 +661,7 @@ async function googleLogin() {
     }
     currentUser = { uid: user.uid, identifier: email, role, loginTime: Date.now() };
     isAdmin = true;
-    isSuperAdmin = isSuperAdminEmail(email);
+    isSuperAdmin = SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === email.toLowerCase());
     await db.ref('users/' + user.uid).set({ identifier: email, email, role, super: isSuperAdmin, lastLogin: Date.now() });
     logLogin(user.uid, email, role);
     document.getElementById('login-view').style.display = 'none';
@@ -677,7 +673,7 @@ async function googleLogin() {
       if (sec) sec.style.display = 'block';
       const tb = document.getElementById('tab-manage-admins');
       if (tb) tb.style.display = 'block';
-      loadAdminList();
+      if (typeof loadAdminList === 'function') loadAdminList();
     }
     showToast('✅ Google 登入成功：' + email);
     initDriverPanel();
@@ -687,9 +683,6 @@ async function googleLogin() {
   }
 }
 
-/* ============================================================
- * 頁面載入
- * ============================================================ */
 window.addEventListener('load', () => {
   if (typeof initGlobalVoiceButton === 'function') initGlobalVoiceButton();
   if (typeof initMsgNotification === 'function') initMsgNotification();
@@ -702,7 +695,7 @@ window.addEventListener('load', () => {
         const role = await checkRole(d.identifier);
         currentUser = { uid: u.uid, identifier: d.identifier, role, loginTime: Date.now() };
         isAdmin = (role === 'admin');
-        isSuperAdmin = isSuperAdminEmail(d.identifier);
+        isSuperAdmin = SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === d.identifier.toLowerCase());
         document.getElementById('login-view').style.display = 'none';
         document.getElementById('main-view').style.display = 'block';
         if (isAdmin) {
@@ -713,7 +706,7 @@ window.addEventListener('load', () => {
             if (sec) sec.style.display = 'block';
             const tb = document.getElementById('tab-manage-admins');
             if (tb) tb.style.display = 'block';
-            loadAdminList();
+            if (typeof loadAdminList === 'function') loadAdminList();
           }
         }
         initDriverPanel();
@@ -736,7 +729,6 @@ window.addEventListener('load', () => {
   });
 });
 
-/* ---------- 全域暴露 ---------- */
 window.doLogin = doLogin;
 window.googleLogin = googleLogin;
 window.addPass = addPass;
